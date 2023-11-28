@@ -1,0 +1,57 @@
+.tournament-selector {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  opacity: 0.5;
+  font-size: 16px;
+  margin-top: -5px;
+}
+
+.segments {
+  margin-top: 0px;
+  font-size: 20px;
+  display: flex;
+  font-weight: 500;
+  line-height: 20px;
+
+  > * {
+    transition: 300ms opacity;
+  }
+
+  :not(:last-child)::after {
+    content: "\00B7";
+    font-weight: 700;
+    font-size: 24px;
+    margin: 0 5px;
+    opacity: 0.4;
+    text-decoration: none !important;
+  }
+  &:hover > *:not(:hover) {
+    opacity: 0.5;
+  }
+}
+
+.button {
+  opacity: 0.2;
+  margin-left: 12px;
+  cursor: pointer;
+  transition: 150ms opacity;
+  padding: 4px;
+
+  &:hover {
+    opacity: 0.5;
+  }
+}
+
+.inline-value {
+  user-select: none;
+  cursor: pointer;
+}

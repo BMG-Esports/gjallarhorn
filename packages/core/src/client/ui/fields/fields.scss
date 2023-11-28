@@ -1,0 +1,433 @@
+textarea.input {
+  resize: vertical;
+  min-height: 60px;
+  height: auto;
+}
+
+.input {
+  height: 30px;
+  border: 0;
+  font: inherit;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  padding: 0 4px;
+  color: var(--fg-1);
+  border: 2px solid rgba(var(--fg), 0.2);
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  outline: none;
+
+  &:focus {
+    border-color: rgba(var(--fg), 0.3);
+  }
+
+  &.dirty {
+    background: rgba(var(--fg), 0.1);
+    border-color: transparent;
+
+    &:focus {
+      border-color: transparent;
+      background: rgba(var(--fg), 0.2);
+    }
+  }
+
+  &.big {
+    height: 40px;
+    min-width: 240px;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+  }
+}
+
+select.input option {
+  color: black;
+}
+
+@keyframes pulse {
+  0% {
+    background: rgba(var(--fg), 0.1);
+  }
+  50% {
+    background: rgba(var(--fg), 0.4);
+  }
+  100% {
+    background: rgba(var(--fg), 0.1);
+  }
+}
+
+.button {
+  position: relative;
+  user-select: none;
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--fg-1);
+  background: rgba(var(--fg), 0.2);
+  text-transform: uppercase;
+  box-shadow: 0 4px 4px rgba(var(--bg), 0.15);
+  cursor: pointer;
+  transition: background-color 150ms;
+
+  &:hover {
+    background: rgba(var(--fg), 0.25);
+  }
+
+  &:active {
+    background: rgba(var(--fg), 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  &.big {
+    padding: 0 16px;
+    height: 40px;
+  }
+
+  &.flat {
+    box-shadow: none;
+    height: 28px;
+    background: rgba(var(--fg), 0.1);
+
+    &:hover {
+      background: rgba(var(--fg), 0.2);
+    }
+
+    &:active {
+      background: rgba(var(--fg), 0.05);
+    }
+  }
+
+  &.icon {
+    display: flex;
+    align-items: center;
+    svg {
+      height: 18px;
+    }
+  }
+
+  &.dirty {
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      animation: 1s pulse infinite;
+    }
+  }
+
+  &.enabled {
+    background: rgba(var(--fg), 0.9);
+    color: var(--bg-1);
+  }
+}
+
+.auto-toggle {
+  padding: 0 8px 0 4px;
+  align-self: stretch;
+  height: auto;
+  text-transform: none;
+  background: rgba(var(--fg), 0.05);
+  gap: 2px;
+  font-weight: 500;
+
+  &.enabled {
+    background: rgba(var(--fg), 0.9);
+    color: var(--bg-1);
+  }
+}
+
+.label {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  > span {
+    user-select: none;
+    font-size: 12px;
+    opacity: 0.5;
+  }
+
+  &.inline {
+    align-items: center;
+    flex-direction: row-reverse;
+    gap: 6px;
+    margin: 0;
+    align-self: center;
+    cursor: pointer;
+
+    .input {
+      display: none;
+    }
+
+    > span {
+      flex: 0 0 auto;
+      opacity: 1;
+      font-size: 14px;
+      white-space: nowrap;
+      font-weight: 500;
+      transform: translate(0, -1px);
+    }
+
+    > svg {
+      display: block;
+      opacity: 0.3;
+      height: 20px;
+    }
+
+    &:hover > svg {
+      opacity: 0.7 !important;
+    }
+
+    .input:checked + svg {
+      opacity: 0.5;
+    }
+  }
+}
+
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+
+  &.no-gap {
+    gap: 0;
+  }
+
+  > .label {
+    flex: 1 1 auto;
+  }
+}
+
+/** Styles for select search component */
+
+/**
+ * Main wrapper
+ */
+:global(.select-search) {
+  position: relative;
+  box-sizing: border-box;
+}
+
+:global(.select-search) *,
+:global(.select-search) *::after,
+:global(.select-search) *::before {
+  box-sizing: inherit;
+}
+
+/**
+* Value wrapper
+*/
+:global(.select-search__value) {
+  position: relative;
+  z-index: 1;
+}
+
+:global(.select-search__value)::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: calc(50% - 6px);
+  right: 12px;
+  width: 8px;
+  height: 8px;
+}
+
+/**
+* Input
+*/
+:global(.select-search__input) {
+  display: block;
+  height: 30px;
+  width: 100%;
+  padding: 0 16px 0 4px;
+  border: 2px solid rgba(var(--fg), 0.2);
+  outline: none;
+  text-align: left;
+  text-overflow: ellipsis;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  -webkit-appearance: none;
+}
+
+:global(.select-search__input)::-webkit-search-decoration,
+:global(.select-search__input)::-webkit-search-cancel-button,
+:global(.select-search__input)::-webkit-search-results-button,
+:global(.select-search__input)::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+
+:global(.select-search__input):not([readonly]):focus {
+  cursor: initial;
+}
+
+/**
+* Options wrapper
+*/
+:global(.select-search__select) {
+  background: var(--bg-3);
+  font-size: 0.9em;
+  box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.15);
+  width: fit-content;
+  min-width: 100%;
+  max-width: 500px;
+}
+
+/**
+* Options
+*/
+:global(.select-search__options) {
+  list-style: none;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  top: 0;
+}
+
+/**
+* Option row
+*/
+:global(.select-search__row):not(:first-child) {
+  border-top: 1px solid rgba(var(--fg), 5%);
+}
+
+/**
+* Option
+*/
+:global(.select-search__option),
+:global(.select-search__not-found) {
+  display: block;
+  height: 30px;
+  width: 100%;
+  padding: 0 4px;
+  border: none;
+  outline: none;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  color: white;
+  font: inherit;
+  font-weight: 300;
+  color: rgba(var(--fg), 80%);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+:global(.select-search--multiple) :global(.select-search__option) {
+  height: 48px;
+}
+
+:global(.select-search__option.is-selected) {
+  background: rgba(var(--fg), 5%);
+  color: #fff;
+}
+
+:global(.select-search__option.is-highlighted),
+:global(.select-search__option):not(:global(.is-selected)):hover {
+  background: rgba(var(--fg), 10%);
+  color: #fff;
+}
+
+:global(.select-search__option.is-highlighted.is-selected),
+:global(.select-search__option.is-selected):hover {
+  background: rgba(var(--fg), 15%);
+  color: #fff;
+}
+
+/**
+* Group
+*/
+:global(.select-search__group-header) {
+  font-size: 10px;
+  text-transform: uppercase;
+  background: #eee;
+  padding: 8px 16px;
+}
+
+/**
+* States
+*/
+:global(.select-search.is-disabled) {
+  opacity: 0.5;
+}
+
+:global(.select-search.is-loading) :global(.select-search__value)::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Cpath fill='%232F2D37' d='M25,5A20.14,20.14,0,0,1,45,22.88a2.51,2.51,0,0,0,2.49,2.26h0A2.52,2.52,0,0,0,50,22.33a25.14,25.14,0,0,0-50,0,2.52,2.52,0,0,0,2.5,2.81h0A2.51,2.51,0,0,0,5,22.88,20.14,20.14,0,0,1,25,5Z'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 25 25' to='360 25 25' dur='0.6s' repeatCount='indefinite'/%3E%3C/path%3E%3C/svg%3E");
+  background-size: 11px;
+}
+
+:global(.select-search):not(.is-disabled) :global(.select-search__input) {
+  cursor: pointer;
+}
+
+/**
+* Modifiers
+*/
+:global(.select-search--multiple) {
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+:global(.select-search):not(:global(.is-loading)):not(:global(.select-search--multiple))
+  :global(.select-search__value)::after {
+  transform: rotate(45deg);
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  pointer-events: none;
+}
+
+:global(.select-search--multiple) :global(.select-search__input) {
+  cursor: initial;
+}
+
+:global(.select-search--multiple) :global(.select-search__input) {
+  border-radius: 3px 3px 0 0;
+}
+
+:global(.select-search--multiple):not(:global(.select-search--search))
+  :global(.select-search__input) {
+  cursor: default;
+}
+
+:global(.select-search):not(:global(.select-search--multiple))
+  :global(.select-search__input):hover {
+  border-color: rgba(var(--fg), 0.3);
+}
+
+:global(.select-search):not(:global(.select-search--multiple))
+  :global(.select-search__select) {
+  position: absolute;
+  z-index: 2;
+  top: 30px;
+  right: 0;
+  left: 0;
+  overflow-x: auto;
+  max-height: 360px;
+}
+
+:global(.select-search--multiple) :global(.select-search__select) {
+  position: relative;
+  max-height: 260px;
+  border-top: 1px solid #eee;
+  border-radius: 0 0 3px 3px;
+}
+
+:global(.select-search__not-found) {
+  height: auto;
+  padding: 16px;
+  text-align: center;
+  color: #888;
+}

@@ -1,0 +1,114 @@
+.preview {
+  user-select: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 10px 0;
+  font-size: 13px;
+
+  > div {
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+
+    &.placeholder {
+      cursor: not-allowed;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(var(--fg), 0.05),
+        rgba(var(--fg), 0.05) 10px,
+        transparent 10px,
+        transparent 20px
+      );
+    }
+
+    &.add-set {
+      min-height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      background: rgba(var(--fg), 0.025);
+
+      &:hover {
+        background: rgba(var(--fg), 0.05);
+      }
+    }
+
+    .set {
+      background: rgba(var(--fg), 0.1);
+      padding: 6px 4px;
+      text-align: center;
+      line-height: 1.1;
+    }
+
+    &.complete .set {
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(var(--fg), 0.05),
+        rgba(var(--fg), 0.05) 10px,
+        transparent 10px,
+        transparent 20px
+      );
+    }
+
+    &.active {
+      .set {
+        background: rgba(var(--bg), 0.3);
+      }
+
+      .round {
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+.round {
+  text-align: center;
+  font-weight: 500;
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+  opacity: 0.3;
+}
+
+.entrant i {
+  opacity: 0.3;
+}
+
+.score {
+  opacity: 0.6;
+}
+
+svg.complete {
+  position: absolute;
+  height: 14px;
+  bottom: 2px;
+  right: 0;
+}
+
+.controls {
+  display: grid;
+  user-select: none;
+  margin: 10px 0;
+  grid-template-columns: auto 1fr auto;
+  font-size: 14px;
+  > div {
+    text-align: center;
+  }
+
+  svg {
+    opacity: 0.7;
+    cursor: pointer;
+    transition: 150ms opacity;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &.disabled {
+      opacity: 0.1;
+      pointer-events: none;
+    }
+  }
+}

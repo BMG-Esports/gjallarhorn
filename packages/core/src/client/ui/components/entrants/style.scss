@@ -1,0 +1,53 @@
+.columns {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 10px;
+}
+
+.middle {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  > div {
+    flex: 1 1 auto;
+  }
+}
+
+.middle button {
+  width: 100%;
+}
+
+.column {
+  header {
+    font-size: 20px;
+    display: flex;
+    font-weight: 500;
+    justify-content: space-between;
+    vertical-align: middle;
+
+    svg {
+      opacity: 0.3;
+      cursor: pointer;
+      transition: 200ms opacity;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  hr {
+    border: 0;
+    border-bottom: 2px dotted rgba(var(--fg), 0.1);
+    margin-top: 10px;
+  }
+}
+
+.player-fields {
+  h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 10px 0 0;
+  }
+}

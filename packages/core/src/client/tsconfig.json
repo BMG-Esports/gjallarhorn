@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "noImplicitAny": true,
+    "target": "esnext",
+    "lib": ["ES2021", "DOM"],
+    "types": ["reflect-metadata"],
+    "jsx": "react",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "typeRoots": ["./@types", "../@types", "../../../node_modules/@types"],
+    "incremental": true,
+    "outDir": "../../lib/client"
+  },
+  "include": ["./"]
+}

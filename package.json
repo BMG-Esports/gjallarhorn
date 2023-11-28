@@ -1,0 +1,37 @@
+{
+  "name": "@bmg-esports/gjallarhorn",
+  "description": "Bundle of stream tools for Brawlhalla tournaments",
+  "private": true,
+  "workspaces": [
+    "packages/tokens",
+    "packages/core",
+    "packages/cli"
+  ],
+  "bin": {
+    "stk": "packages/cli/lib/index.js"
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "build": "npm run build --workspaces",
+    "clean": "npm run clean --workspaces && rimraf output temp",
+    "build:clean": "npm run clean && npm run build",
+    "dev:cli": "cross-env GJALLARHORN_PORT=55213 npm run dev --workspace=packages/cli",
+    "dev:client": "cross-env GJALLARHORN_PORT=55213 npm run dev:client --workspace=packages/core",
+    "dev": "concurrently \"npm run dev:cli\" \"npm run dev:client\"",
+    "start": "node --inspect=0.0.0.0:9229 --enable-source-maps .",
+    "docker": "bash docker/scripts/build.sh"
+  },
+  "devDependencies": {
+    "@types/node": "*",
+    "husky": "^7.0.4",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.4.4",
+    "concurrently": "^8.2.2"
+  },
+  "lint-staged": {
+    "**/*": [
+      "eslint",
+      "prettier --write --ignore-unknown"
+    ]
+  }
+}
