@@ -98,7 +98,7 @@ export function useKeybind(
 export function useTitle(title: string) {
   useEffect(() => {
     const oldTitle = document.title;
-    document.title = `${title} · Stream Toolkit`;
+    document.title = `${title} · Gjallarhorn`;
     return () => void (document.title = oldTitle);
   }, [title]);
 }

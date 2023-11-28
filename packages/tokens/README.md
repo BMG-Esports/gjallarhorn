@@ -1,6 +1,6 @@
 # `tokens`
 
-Helper module for stream toolkit. Registers and exports dependencies.
+Helper module for gjallarhorn. Registers and exports dependencies.
 
 ## Usage
 

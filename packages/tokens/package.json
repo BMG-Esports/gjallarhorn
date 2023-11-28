@@ -1,7 +1,7 @@
 {
   "name": "@bmg-esports/gjallarhorn-tokens",
   "version": "0.0.0",
-  "description": "Service identifiers for the Stream Toolkit",
+  "description": "Service identifiers for the Gjallarhorn",
   "homepage": "https://github.com/BMG-Esports/gjallarhorn#readme",
   "license": "MIT",
   "main": "lib/tokens.js",

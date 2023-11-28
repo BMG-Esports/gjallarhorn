@@ -100,9 +100,7 @@ export const SystemWidget = () => {
         {fatal && (
           <div>
             <h3 className={colors.red}>Fatal Error</h3>
-            <p>
-              Stream Toolkit experienced a fatal error and must be inspected.
-            </p>
+            <p>Gjallarhorn experienced a fatal error and must be inspected.</p>
             <InputRow>
               <Button
                 onClick={() =>
@@ -132,7 +130,7 @@ export const SystemWidget = () => {
             }
           >
             <Server />
-            <span>Stream Toolkit</span>
+            <span>Gjallarhorn</span>
           </div>
         </div>
         <div className={styles.rates}>

@@ -1,6 +1,6 @@
-# `Stream Toolkit`
+# `Gjallarhorn`
 
-Stream Toolkit is a tool for Brawlhalla community tournament runners to generate
+Gjallarhorn is a tool for Brawlhalla community tournament runners to generate
 properly formatted JSON for Twitch overlays. This supports overlays for Game,
 Players, Queue, Ticker, Casters, and Lower Thirds. It pulls data from start.gg
 as well as Brawlhalla's Stats API.
@@ -22,7 +22,7 @@ in `packages/cli/output`
 
 ## Project Overview
 
-Stream Toolkit consists of a React front end and a NodeJS backend. The NodeJS
+Gjallarhorn consists of a React front end and a NodeJS backend. The NodeJS
 backends act as data stores for the data input into the cards. Backend updates
 from `setState`are published over the websocket to the front end for display
 purposes (like results of calls for start.gg). The front end can also subscribe
@@ -73,11 +73,11 @@ app. We publish the errors to the operator and give the user the option to mark
 them as non-fatal and pause the tournament, or default to a meaningful value
 (like if start.gg does not return a value for a field)
 
-**Project Structure** Core contains the meat of stream toolkit. You will find
-card UI built from React components in `src/client/pages/cards` and their
-respective backends in `src/backends`. Reusable UI elements are grouped in
-`src/client/ui`. The networking layer is found in `src/services`, like the one
-to the Brawlhalla Stats API (`db.ts`)
+**Project Structure** Core contains the meat of gjallarhorn. You will find card
+UI built from React components in `src/client/pages/cards` and their respective
+backends in `src/backends`. Reusable UI elements are grouped in `src/client/ui`.
+The networking layer is found in `src/services`, like the one to the Brawlhalla
+Stats API (`db.ts`)
 
 ## Contributors
 

@@ -27,7 +27,7 @@ export class PlayerService {
   @inject(TTournamentBackend) private t: TournamentBackend;
 
   /**
-   * Convert a start.gg entrant to a Stream Toolkit entrant.
+   * Convert a start.gg entrant to a Gjallarhorn entrant.
    */
   async parseEntrant(
     sEntrant: SEntrant,
@@ -55,7 +55,7 @@ export class PlayerService {
   }
 
   /**
-   * Convert a smash.gg participant to a Stream Toolkit player.
+   * Convert a smash.gg participant to a Gjallarhorn player.
    */
   async parseParticipant(
     participant: SParticipant,
