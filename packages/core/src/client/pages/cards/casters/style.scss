@@ -1,0 +1,10 @@
+.casters {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 10px;
+
+  h3 {
+    margin: 0;
+  }
+}

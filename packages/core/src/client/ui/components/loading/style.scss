@@ -1,0 +1,33 @@
+@keyframes bounce {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.loading {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 72px;
+
+  > * {
+    width: 12px;
+    height: 12px;
+    background: rgba(var(--fg), 20%);
+    transform: translateY(6px);
+    border-radius: 100%;
+    animation: bounce 1s infinite ease-in-out;
+
+    &:nth-child(3) {
+      animation-delay: -400ms;
+    }
+
+    &:nth-child(2) {
+      animation-delay: -200ms;
+    }
+  }
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+}

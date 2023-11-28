@@ -1,0 +1,145 @@
+body:global(.dark) {
+  --bg: 0, 0, 0;
+  --bg-1: hsl(0, 0%, 10%);
+  --bg-2: hsl(0, 0%, 15%);
+  --bg-3: hsl(0, 0%, 20%);
+
+  --fg: 255, 255, 255;
+  --fg-1: #ffffff;
+}
+
+body:global(.light) {
+  --bg: 60, 60, 60;
+  --bg-3: hsl(0, 0%, 100%);
+  --bg-2: hsl(0, 0%, 90%);
+  --bg-1: hsl(0, 0%, 80%);
+
+  --fg-1: #222222;
+  --fg: 20, 20, 20;
+}
+
+/** React Popup styling **/
+@keyframes popupSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+}
+
+@keyframes popupSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
+:global(.popup-content) {
+  margin: auto;
+  color: var(--fg-1);
+  background: var(--bg-3);
+  animation: 200ms popupSlideDown forwards;
+
+  &:global(.up-content) {
+    animation-name: popupSlideUp;
+  }
+}
+
+:global(.popup-tooltip) {
+  font-size: 13px;
+  line-height: 1;
+  color: rgba(var(--fg), 50%);
+  padding: 4px 6px;
+}
+
+:global(.popup-menu) {
+  white-space: nowrap;
+  user-select: none;
+  padding: 5px;
+  min-width: 250px;
+
+  > * {
+    display: block;
+    text-decoration: none;
+    padding: 4px 8px;
+    opacity: 0.3;
+    transition: 300ms opacity;
+    cursor: pointer;
+
+    &:global(.active),
+    &:hover {
+      opacity: 1;
+    }
+
+    &:hover {
+      background: rgba(var(--fg), 5%);
+    }
+  }
+
+  &:global(.no-hover) > :hover {
+    opacity: 0.3;
+    background: transparent;
+  }
+
+  &:global(.highlight-active) > :global(.active) {
+    opacity: 1 !important;
+    background: rgba(var(--fg), 5%) !important;
+  }
+
+  &:global(.fixed) {
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 6px;
+    background: var(--bg-2);
+    position: fixed;
+  }
+}
+
+:global(.popup-arrow) {
+  color: var(--bg-3);
+}
+:global([role="tooltip"].popup-content) {
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 6px;
+}
+:global(.popup-overlay) {
+  background: rgba(0, 0, 0, 0.5);
+}
+:global([data-popup="tooltip"].popup-overlay) {
+  background: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  background: var(--bg-1);
+  color: var(--fg-1);
+  overflow-x: hidden;
+}
+
+a[href] {
+  color: inherit;
+}
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--fg), 0.4) rgba(var(--bg), 0.02);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(var(--bg), 0.5);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--fg), 0.2);
+  border-radius: 0px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(var(--fg), 0.3);
+}

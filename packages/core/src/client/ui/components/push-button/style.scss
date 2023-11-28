@@ -1,0 +1,109 @@
+@keyframes load {
+  50% {
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+}
+
+@keyframes animateIcon {
+  0% {
+    transform: translateX(-10px);
+    opacity: 0;
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  }
+  50% {
+    transform: none;
+    opacity: 1;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  66% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeTextIn {
+  0% {
+    opacity: 0.3;
+    color: rgba(var(--fg), 20%);
+  }
+  67% {
+    opacity: 0.3;
+    color: rgba(var(--fg), 20%);
+  }
+}
+
+.push-button {
+  position: relative;
+  overflow: hidden;
+
+  &.loading {
+    button {
+      color: rgba(var(--fg), 20%);
+    }
+
+    .loading-icon {
+      opacity: 1;
+      transform: none;
+      transition-duration: 300ms, 0s;
+    }
+  }
+
+  .loading-icon {
+    pointer-events: none;
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: opacity 300ms, transform 150ms;
+
+    > div {
+      width: 6px;
+      height: 6px;
+      border-radius: 100%;
+      background: currentColor;
+      margin: 0 2px;
+      opacity: 0.4;
+      transform: translateY(2px);
+      animation: load 0.8s infinite;
+
+      &:nth-child(2) {
+        animation-delay: -150ms;
+      }
+
+      &:nth-child(1) {
+        animation-delay: -300ms;
+      }
+    }
+  }
+
+  &.status {
+    button {
+      animation: 1s fadeTextIn forwards;
+    }
+
+    .status-icon {
+      pointer-events: none;
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  &.status .status-icon svg {
+    animation: 1s animateIcon forwards;
+  }
+}

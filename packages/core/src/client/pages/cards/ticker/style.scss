@@ -1,0 +1,58 @@
+.entries {
+  display: flex;
+  flex-direction: column;
+  position: static;
+  margin: 0px -4px 0px;
+  min-height: 10px;
+}
+
+.entry-container {
+  padding: 4px;
+  background: var(--bg-2);
+
+  &:not(:last-child) {
+    border-bottom: 1px dotted rgba(var(--fg), 0.1);
+  }
+}
+
+.entry {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+
+  svg {
+    opacity: 0.5;
+    height: 18px;
+    display: block;
+  }
+}
+
+.icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .delete {
+    cursor: pointer;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.editor {
+  display: grid;
+  grid-template-columns: 3fr 5fr;
+
+  i {
+    opacity: 0.2;
+  }
+}
+
+.input {
+  border: 0;
+  display: block;
+  &:focus {
+    background: rgba(var(--fg), 0.05);
+  }
+}

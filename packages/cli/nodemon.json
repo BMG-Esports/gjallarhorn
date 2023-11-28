@@ -1,0 +1,4 @@
+{
+  "watch": ["lib/"],
+  "nodeArgs": ["--inspect", "--enable-source-maps", "--require=dotenv/config"]
+}

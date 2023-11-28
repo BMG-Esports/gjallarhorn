@@ -1,0 +1,11 @@
+**/node_modules/
+**/lib/
+**/build/
+**/scratch/
+**/output/
+**/temp/
+**/logs/
+*.log
+tsconfig.tsbuildinfo
+.DS_Store
+.env
