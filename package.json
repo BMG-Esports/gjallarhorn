@@ -7,8 +7,9 @@
     "packages/core",
     "packages/cli"
   ],
+  "main": "packages/cli/lib/index.js",
   "bin": {
-    "stk": "packages/cli/lib/index.js"
+    "gjallarhorn": "packages/cli/lib/index.js"
   },
   "scripts": {
     "prepare": "husky install",
