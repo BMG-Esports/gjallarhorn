@@ -17,7 +17,7 @@ Then, launch the dashboard at http://localhost:3000.
 
 ## Usage
 
-You will find 6 different cards on the dashboard: Casters, Game, Ticker, Players, Queue, and Lower Thirds. You can fill out the cards with the details you want on the overlay and hit "Push". You will find the output files served over http at http://localhost:3000/api/json or the raw JSON files in packages/cli/output.
+You will find 6 different cards on the dashboard: Casters, Game, Ticker, Players, Queue, and Lower Thirds. You can fill out the cards with the details you want on the overlay and hit "Push". You will find the output files served over http at http://localhost:3000/api/json or the raw JSON files in `packages/cli/output`.
 
 ![A Gjallarhorn interface filled in](images/gjallarhorn.png)
 
