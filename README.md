@@ -1,10 +1,10 @@
 # `Gjallarhorn`
 
-Gjallarhorn is a tool for Brawlhalla community tournament runners to generate properly formatted JSON for Twitch overlays. Gjallarhorn can generate JSON for multiple use cases, including tickers, casters, lower thirds, queues, players, and games. It pulls data from start.gg as well as Brawlhalla's Stats API.
+Gjallarhorn is a tool for Brawlhalla community tournament organizers to generate properly formatted JSON for Twitch overlays. Gjallarhorn can generate JSON for multiple use cases, including tickers, casters, lower thirds, queues, players, and games. It pulls data from start.gg as well as Brawlhalla's Stats API.
 
 ## Getting Started
 
-You will need a Start.gg API key to use Gjallarhorn. If you don't have one already, get one at https://developer.start.gg/docs/authentication.
+You will need a start.gg API key to use Gjallarhorn. If you don't have one already, get one at https://developer.start.gg/docs/authentication.
 
 To start Gjallarhorn, run the following commands in the project:
 
@@ -21,6 +21,16 @@ You will find 6 different cards on the dashboard: Casters, Game, Ticker, Players
 
 ![A Gjallarhorn interface filled in](images/gjallarhorn.png)
 
+You can reorder the cards by dragging the title bar. A dotted line will show where the card will be placed.
+
+![The Player card being reordered](images/gjallardrag.png)
+
+You can also recolor each card by right clicking on the title bar.
+
+![The Lower Thirds card with the color modal open](images/gjallarcolors.png)
+
+If a card is unnecessary or temporarily unneeded, you can minimize it by clicking the arrow at the right of each card next to the push button.
+
 These JSON files can be connected to broadcasting software (vMix or OBS with applicable plugins) to allow for seamless editing and usage of data. However, not all of this data will be useful or even applicable even if you are hosting a tournament.
 
 ### Header
@@ -31,7 +41,7 @@ Push Brackets will output JSON to be used in bracket images. You can have these 
 
 ![A green checkmark](images/gjallarcheck.png)
 
-Hovering over the checkmark icon next to the search bar shows you the application latency and the rate limits for both the database and Start.gg.
+Hovering over the checkmark icon next to the search bar shows you the application latency and the rate limits for both the database and start.gg.
 
 ![A yellow disconnection indicator](images/gjallardc.png)
 
@@ -39,25 +49,25 @@ If your Gjallarhorn instance is unexpectedly terminated, the icon will change an
 
 ![An active user icon](images/gjallaruser.png)
 
-Hovering over this icon will show radials that enable light mode and push notifications for possible errors.
+Hovering over this icon will show checkboxes that enable light mode and push notifications for possible errors respectively.
 
 ### Casters
 
 ![The Casters card](images/gjallarcasters.png)
 
-You can add up to four different casters, with blanks for their name, Twitter/X accounts, and pronouns.
+You can enter up to four different casters, with text boxes for their name, Twitter/X accounts, and pronouns.
 
 ### Game
 
 ![The Game card](images/gjallargame.png)
 
-This card can be input manually, or you can use the Set dropdown to populate text with a Start.gg match. You can also import a set from the Queue card by clicking on the clipboard next to Push Round. Rounds won can be incremented using the plus and minus buttons next to Left and Right.
+This card can be input manually, or you can use the Set dropdown to populate text with a start.gg match. You can also import a set from the Queue card by clicking on the clipboard next to Push Round. Rounds won can be incremented using the plus and minus buttons next to Left and Right.
 
 ### Players
 
 ![The Player card](images/gjallarplayers.png)
 
-This card can be input manually. You can also import players from the Game card or the Queue card with the clipboard button next to Push. When importing players, Gjallarhorn will attempt to populate the Lifetime Score blank with information from the Stats API. It can also be manually incremented with the plus and minus buttons. The legend loaded for each player will be the most recently reported legend in the current tournament if applicable. Otherwise, it will be the last legend the player ever reported.
+This card can be input manually. You can also import players from the Game card or the Queue card with the clipboard button next to Push. When importing players, Gjallarhorn will attempt to populate the Lifetime Score textbox with information from the Stats API. It can also be manually incremented with the plus and minus buttons. The legend loaded for each player will be the most recently reported legend in the current tournament (if applicable). Otherwise, it will be the last legend the player ever reported.
 
 ### Ticker
 
@@ -69,7 +79,7 @@ Can be used for miscellaneous ticker text. By clicking the timer next to shuffle
 
 ![The Queue card](images/gjallarqueue.png)
 
-The Queue card pulls queues from a Start.gg tournament. In order for this card to be useful, your tournament must have at least one active queue. You can continuously fetch the currently active queue every sixty seconds by clicking the timer next to Fetch Queue.
+The Queue card pulls queues from a start.gg tournament. In order for this card to be useful, your tournament must have at least one active queue. You can continuously fetch the currently active queue every sixty seconds by clicking the timer next to Fetch Queue.
 
 ### Lower Thirds
 
