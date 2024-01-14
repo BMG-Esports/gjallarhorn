@@ -48,7 +48,7 @@ You can also recolor each card by right clicking on the title bar.
 
 If a card is unnecessary or temporarily unneeded, you can minimize it by clicking the arrow at the right of each card next to the push button.
 
-These JSON files can be connected to broadcasting software (vMix or OBS with applicable plugins) to allow for seamless editing and usage of data. However, not all of this data will be useful or even applicable even if you are hosting a tournament. Feel free to disregard any of the forms or data that are unnecessary for your production environment.
+These JSON files can be connected to broadcasting software (vMix or OBS with applicable plugins) to allow for seamless editing and usage of data. However, not all of this data will be useful or even applicable to all organizers, and you can decide what data you'd like to use. Feel free to disregard any of the forms or data that are unnecessary for your production environment.
 
 ### Header
 
@@ -90,7 +90,7 @@ This card can be input manually. You can also import players from the Game card 
 
 ![The Ticker Card](images/gjallarticker.png)
 
-Useful for creating tickers. These tickers can be manually moved by dragging the [] next to the subject, and can be randomly shuffled by hitting the shuffle button. By clicking the timer next to shuffle, the tickers will automatically shuffle every five minutes.
+Used to create tickers (as the name implies). These tickers can be manually moved by dragging the vertical arrow icon next to the subject, and can be randomly shuffled by hitting the shuffle button. By clicking the timer next to shuffle, the tickers will automatically shuffle every five minutes.
 
 ### Queue
 
