@@ -2,6 +2,23 @@
 
 Gjallarhorn is a tool for Brawlhalla community tournament organizers to generate properly formatted JSON for Twitch overlays. Gjallarhorn can generate JSON for multiple use cases, including tickers, casters, lower thirds, queues, players, and games. It pulls data from start.gg as well as Brawlhalla's Stats API.
 
+## Contents
+
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Header](#header)
+- [Casters](#casters)
+- [Game](#game)
+- [Players](#players)
+- [Ticker](#ticker)
+- [Queue](#queue)
+- [Lower Thirds](#lower-thirds)
+
+---
+
+- [Project Overview](#project-overview)
+- [Contrbutors](#contributors)
+
 ## Getting Started
 
 You will need a start.gg API key to use Gjallarhorn. If you don't have one already, get one at https://developer.start.gg/docs/authentication.
@@ -31,13 +48,13 @@ You can also recolor each card by right clicking on the title bar.
 
 If a card is unnecessary or temporarily unneeded, you can minimize it by clicking the arrow at the right of each card next to the push button.
 
-These JSON files can be connected to broadcasting software (vMix or OBS with applicable plugins) to allow for seamless editing and usage of data. However, not all of this data will be useful or even applicable even if you are hosting a tournament.
+These JSON files can be connected to broadcasting software (vMix or OBS with applicable plugins) to allow for seamless editing and usage of data. However, not all of this data will be useful or even applicable even if you are hosting a tournament. Feel free to disregard any of the forms or data that are unnecessary for your production environment.
 
 ### Header
 
-In the top left corner, the current tournament is indicated next to the hamburger menu. The pencil allows you to change the active tournament. Enter the tournament’s unique slug (“brawlhalla-world-championship-expo-2023”) to switch to that tournament. Shorthand forms also exist for certain tournaments (“bcx”). Clicking on the game mode (In this example, Brawlhalla Championship 1v1) allows you to swap between different tournament game modes if they exist. The pools can also be swapped similarly.
+In the top left corner, the current tournament is indicated next to the hamburger menu. The pencil icon opens a text box where you can change the active tournament. Enter the tournament’s unique slug (“brawlhalla-world-championship-expo-2023”) to switch to that tournament. Shorthand forms also exist for certain tournaments (“bcx”). Clicking on the game mode (In this example, Brawlhalla Championship 1v1) allows you to switch between different tournament game modes if they exist. The pools can also be swapped similarly.
 
-Push Brackets will output JSON to be used in bracket images. You can have these pushed every two minutes by clicking the timer next to the button.
+Push Brackets will output a JSON file to be used in bracket images. You can have these pushed every two minutes by clicking the timer next to the button.
 
 ![A green checkmark](images/gjallarcheck.png)
 
@@ -55,7 +72,7 @@ Hovering over this icon will show checkboxes that enable light mode and push not
 
 ![The Casters card](images/gjallarcasters.png)
 
-You can enter up to four different casters, with text boxes for their name, Twitter/X accounts, and pronouns.
+You can enter up to four different casters, with text boxes for their name, social media accounts, and pronouns.
 
 ### Game
 
@@ -73,7 +90,7 @@ This card can be input manually. You can also import players from the Game card 
 
 ![The Ticker Card](images/gjallarticker.png)
 
-Can be used for miscellaneous ticker text. By clicking the timer next to shuffle, the tickers will automatically shuffle every five minutes.
+Useful for creating tickers. These tickers can be manually moved by dragging the [] next to the subject, and can be randomly shuffled by hitting the shuffle button. By clicking the timer next to shuffle, the tickers will automatically shuffle every five minutes.
 
 ### Queue
 
