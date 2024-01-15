@@ -1,6 +1,6 @@
 # `Gjallarhorn`
 
-Gjallarhorn is a tool for Brawlhalla community tournament organizers to generate properly formatted JSON for Twitch overlays. Gjallarhorn can generate JSON for multiple use cases, including tickers, casters, lower thirds, queues, players, and games. It pulls data from start.gg as well as Brawlhalla's Stats API.
+Gjallarhorn is a tool for Brawlhalla community tournament producers to generate formatted JSON files for esports tournament stream overlays. Gjallarhorn can generate JSON files for multiple use cases, including tickers, casters, lower thirds, queues, players, and games. It pulls data from start.gg as well as Brawlhalla's Stats API.
 
 ## Getting Started
 
