@@ -39,6 +39,8 @@ These JSON files can be connected to broadcasting software (vMix or OBS with app
 <details>
   <summary>Header</summary>
 
+![The Gjallarhorn header](images/gjallarheader.png)
+
 In the top left corner, the current tournament is indicated next to the hamburger menu. The pencil icon opens a text box where you can change the active tournament. Enter the tournament’s unique slug (“brawlhalla-world-championship-expo-2023”) to switch to that tournament. Shorthand forms also exist for certain tournaments (“bcx”). Clicking on the game mode (In this example, Brawlhalla Championship 1v1) allows you to switch between different tournament game modes if they exist. The pools can also be swapped similarly.
 
 Push Brackets will output a JSON file to be used in bracket images. You can have these pushed every two minutes by clicking the timer next to the button.
@@ -115,7 +117,7 @@ You can create presets for each section. You can also delete the most recently c
 
 </details>
 
-## Project Overview
+## Development Overview
 
 Gjallarhorn consists of a React front end and a NodeJS backend. The NodeJS
 backends act as data stores for the data input into the cards. Backend updates
