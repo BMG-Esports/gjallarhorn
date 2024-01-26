@@ -8,10 +8,14 @@ You will need a start.gg API key to use Gjallarhorn. If you don't have one alrea
 
 To start Gjallarhorn, run the following commands in the project:
 
-```
+```sh
+npm install
 npm run build
 node . -s [your-startgg-key-here]
 ```
+
+> [!NOTE]
+> You only need to run `npm install` and `npm run build` the first time you try to run Gjallarhorn.
 
 Then, launch the dashboard at http://localhost:3000.
 
