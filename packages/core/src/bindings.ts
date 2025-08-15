@@ -10,6 +10,7 @@ import {
   TPlayersBackend,
   TPlayerService,
   TQueueBackend,
+  TChallengerModeService,
   TServerService,
   TStartGGService,
   TSocketService,
@@ -38,6 +39,7 @@ import { LowerThirdsBackend } from "./backends/cards/lower-thirds";
 import { PlayersBackend } from "./backends/cards/players";
 import { QueueBackend } from "./backends/cards/queue";
 import { TickerBackend } from "./backends/cards/ticker";
+import { ChallengerModeService } from "./services/challenger-mode";
 
 const bindings: { [token: symbol]: Newable } = {
   [TSystem]: System,
@@ -49,6 +51,7 @@ const bindings: { [token: symbol]: Newable } = {
   [TPlayerService]: PlayerService,
   [TServerService]: ServerService,
   [TStartGGService]: StartGGService,
+  [TChallengerModeService]: ChallengerModeService,
   [TSocketService]: SocketService,
 
   [TStatusBackend]: StatusBackend,

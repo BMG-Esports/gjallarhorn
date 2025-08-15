@@ -7,16 +7,24 @@ import { TournamentBackend } from "../../../../backends/pages/tournament";
 import { Tournament } from "../../../../@types/startgg";
 import Popup from "reactjs-popup";
 import { Input } from "../../fields/input";
-
-const slugRegex =
+import {
+  GQLTournament,
+  GQLTournamentEliminationStage,
+} from "../../../../@types/challengermode";
+const sggSlugRegex =
   /(?:tournament\/([a-z0-9-]+)\/?|^([a-z0-9-]+)(?:\/event.*)?\/?$)/i;
+const cmIdRegex =
+  /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
 
-const getTournamentSlug = (i: string) => {
-  const match = i.match(slugRegex);
-  return match ? match[1] ?? match[2] : null;
+const getTournamentSlug = (i: string): [string, boolean] => {
+  const cmMatch = i.match(cmIdRegex);
+  if (cmMatch) return [cmMatch[0], true];
+  const sggMatch = i.match(sggSlugRegex);
+  return [sggMatch ? sggMatch[1] ?? sggMatch[2] : null, false];
 };
 
-type TournamentState = TournamentBackend["state"]["tournament"];
+type SggTournamentState = TournamentBackend["state"]["sggTournament"];
+type CmTournamentState = TournamentBackend["state"]["cmTournament"];
 
 function InlineDropdown<T>({
   options,
@@ -79,17 +87,22 @@ export function TournamentSelector({
   setTournament,
   onlyEvent,
   meta,
+  isCm,
+  setIsCm,
 }: {
-  tournament: TournamentState;
-  setTournament: (t: TournamentState) => void;
+  tournament: SggTournamentState | CmTournamentState;
+  setTournament: (t: SggTournamentState | CmTournamentState) => void;
   onlyEvent?: boolean;
-  meta?: Tournament;
+  meta?: Tournament | GQLTournament;
+  isCm: boolean;
+  setIsCm: (isCm: boolean) => void;
 }) {
-  const { tournamentSlug, eventId, phaseId, phaseGroupId } = tournament;
   const [editMode, setEditMode] = useState(false);
 
+  const { tournamentSlug, eventId, phaseId, phaseGroupId } =
+    tournament as SggTournamentState;
   const event = useMemo(
-    () => meta?.events!.find((e) => e.id === eventId),
+    () => (meta as Tournament)?.events?.find((e) => e.id === eventId),
     [meta, eventId]
   );
   const phase = useMemo(
@@ -101,14 +114,38 @@ export function TournamentSelector({
     [phase, phaseGroupId]
   );
 
-  const [newSlug, setNewSlug] = useState(tournamentSlug);
+  const { tournamentId, stageNum, bracketType, roundNum } =
+    tournament as CmTournamentState;
+  const stage = useMemo(
+    () =>
+      (meta as GQLTournament)?.stages?.[
+        stageNum
+      ] as GQLTournamentEliminationStage,
+    [meta, stageNum]
+  );
+  const bracket = useMemo(
+    () => stage?.brackets?.find((b) => b.title === bracketType),
+    [stage, bracketType]
+  );
+  const round = useMemo(() => bracket?.rounds[roundNum], [bracket, roundNum]);
+
+  const [newSlug, setNewSlug] = useState(tournamentId || tournamentSlug);
 
   const exitEditMode = () => {
     setEditMode(false);
-    setTournament({
-      ...tournament,
-      tournamentSlug: getTournamentSlug(newSlug),
-    });
+    const [slug, isChallengerMode] = getTournamentSlug(newSlug);
+    if (isChallengerMode) {
+      setTournament({
+        ...tournament,
+        tournamentId: slug,
+      } as CmTournamentState);
+    } else {
+      setTournament({
+        ...tournament,
+        tournamentSlug: slug,
+      } as SggTournamentState);
+    }
+    setIsCm(isChallengerMode);
   };
 
   return (
@@ -127,7 +164,7 @@ export function TournamentSelector({
                 // Extract the tournament from the pasted url.
                 e.preventDefault();
                 const pasted = e.clipboardData.getData("text");
-                const slug = getTournamentSlug(pasted);
+                const [slug, isCm] = getTournamentSlug(pasted);
                 if (slug) {
                   setNewSlug(slug);
                 }
@@ -151,51 +188,99 @@ export function TournamentSelector({
         <>
           <div className={styles.container}>
             <div className={styles.name}>{meta.name}</div>
-            <div className={styles.segments}>
-              <InlineDropdown
-                options={meta?.events ?? []}
-                toKey={(e) => e.id.toString()}
-                toLabel={(e) => e.name}
-                placeholder=""
-                value={event}
-                setValue={(e) =>
-                  setTournament({
-                    ...tournament,
-                    eventId: e.id,
-                  })
-                }
-              />
-              {!onlyEvent && (
+            {isCm ? (
+              <div className={styles.segments}>
                 <InlineDropdown
-                  options={event?.phases ?? []}
-                  toKey={(p) => p.id.toString()}
-                  toLabel={(p) => p.name}
+                  options={(meta as GQLTournament)?.stages ?? []}
+                  toKey={(s) => s.index.toString()}
+                  toLabel={(s) => s.format}
                   placeholder=""
-                  value={phase}
-                  setValue={(p) =>
+                  value={stage}
+                  setValue={(s) =>
                     setTournament({
                       ...tournament,
-                      phaseId: p.id,
+                      stageNum: s.index,
                     })
                   }
                 />
-              )}
-              {!onlyEvent && phase?.phaseGroups.nodes.length > 1 && (
+                {!onlyEvent && (
+                  <InlineDropdown
+                    options={stage?.brackets ?? []}
+                    toKey={(b) => b.title}
+                    toLabel={(b) => b.title}
+                    placeholder="empty"
+                    value={bracket}
+                    setValue={(b) =>
+                      setTournament({
+                        ...tournament,
+                        bracketType: b.title,
+                      })
+                    }
+                  />
+                )}
+                {!onlyEvent && bracket?.roundCount > 1 && (
+                  <InlineDropdown
+                    options={bracket?.rounds ?? []}
+                    toKey={(r) => r.roundNumber.toString()}
+                    toLabel={(r) => r.title}
+                    placeholder=""
+                    value={round}
+                    setValue={(p) =>
+                      setTournament({
+                        ...tournament,
+                        roundNum: p.roundNumber,
+                      })
+                    }
+                  />
+                )}
+              </div>
+            ) : (
+              <div className={styles.segments}>
                 <InlineDropdown
-                  options={phase?.phaseGroups.nodes ?? []}
-                  toKey={(p) => p.id.toString()}
-                  toLabel={(p) => p.displayIdentifier}
+                  options={(meta as Tournament)?.events ?? []}
+                  toKey={(e) => e.id.toString()}
+                  toLabel={(e) => e.name}
                   placeholder=""
-                  value={phaseGroup}
-                  setValue={(p) =>
+                  value={event}
+                  setValue={(e) =>
                     setTournament({
                       ...tournament,
-                      phaseGroupId: p.id,
+                      eventId: e.id,
                     })
                   }
                 />
-              )}
-            </div>
+                {!onlyEvent && (
+                  <InlineDropdown
+                    options={event?.phases ?? []}
+                    toKey={(p) => p.id.toString()}
+                    toLabel={(p) => p.name}
+                    placeholder=""
+                    value={phase}
+                    setValue={(p) =>
+                      setTournament({
+                        ...tournament,
+                        phaseId: p.id,
+                      })
+                    }
+                  />
+                )}
+                {!onlyEvent && phase?.phaseGroups.nodes.length > 1 && (
+                  <InlineDropdown
+                    options={phase?.phaseGroups.nodes ?? []}
+                    toKey={(p) => p.id.toString()}
+                    toLabel={(p) => p.displayIdentifier}
+                    placeholder=""
+                    value={phaseGroup}
+                    setValue={(p) =>
+                      setTournament({
+                        ...tournament,
+                        phaseGroupId: p.id,
+                      })
+                    }
+                  />
+                )}
+              </div>
+            )}
           </div>
           <Edit2
             onClick={() => {

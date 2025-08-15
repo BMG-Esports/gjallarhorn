@@ -7,7 +7,7 @@ import { TournamentSelector } from "../ui/components/tournament-selector";
 import { PushButton } from "../ui/components/push-button";
 import { CardHost, CardHostHandle } from "../ui/components/cards";
 import { JumpTo } from "../ui/components/cards/jump-to";
-import { TournamentProvider } from "../ui/contexts/tournament";
+import { SggTournamentProvider } from "../ui/contexts/tournament";
 import { SystemWidget } from "../ui/components/system-widget";
 import { AutoToggle } from "../ui/fields/auto-toggle";
 
@@ -24,19 +24,31 @@ export default function TournamentPage() {
   const filteredCards = cards;
 
   const t = useBackend<TournamentBackend>(TTournamentBackend);
-  const [tournament, setTournament] = t.useState("tournament", {
+  const [sggTournament, setSggTournament] = t.useState("sggTournament", {
     tournamentSlug: "",
   });
-  const meta = t.useState("tournamentMeta")[0];
+  const [cmTournament, setCmTournament] = t.useState("cmTournament", {
+    tournamentId: "",
+  });
+  const sggMeta = t.useState("sggTournamentMeta")[0];
+  const cmMeta = t.useState("cmTournamentMeta")[0];
   const pushBracketState = t.useState("pushBracketState")[0];
   const [autoBrackets, setAutoBrackets] = t.useState("autoBrackets");
+  const [isCm, setIsCm] = t.useState("isChallengerMode");
 
   const host = useRef<CardHostHandle>();
 
   return (
-    <TournamentProvider value={tournament}>
+    <SggTournamentProvider value={sggTournament}>
       <Nav>
-        <TournamentSelector {...{ tournament, setTournament, meta }} />
+        <TournamentSelector
+          tournament={isCm ? cmTournament : sggTournament}
+          // @ts-ignore
+          setTournament={isCm ? setCmTournament : setSggTournament}
+          meta={isCm ? cmMeta : sggMeta}
+          isCm={isCm}
+          setIsCm={setIsCm}
+        />{" "}
         <Spacer />
         <AutoToggle
           enabled={autoBrackets}
@@ -45,7 +57,9 @@ export default function TournamentPage() {
         >
           <PushButton
             big
-            disabled={!tournament.eventId}
+            disabled={
+              isCm ? !cmTournament.tournamentId : !sggTournament.eventId
+            }
             state={pushBracketState}
             onClick={() => t.pushBrackets()}
           >
@@ -64,6 +78,6 @@ export default function TournamentPage() {
         cards={filteredCards}
         mode="column"
       />
-    </TournamentProvider>
+    </SggTournamentProvider>
   );
 }

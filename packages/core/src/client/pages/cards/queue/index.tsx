@@ -121,6 +121,7 @@ export const Queue = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
   const pushLoadState = b.useState("pushLoadState")[0];
   const pushFetchState = b.useState("pushFetchState")[0];
   const pushQueueState = b.useState("pushQueueState")[0];
+  const entrantSize = b.useState("entrantSize")[0];
 
   const current = active > -1 && queue[startIndex + active];
   const setCurrent = (qs: QueueSet) => {
@@ -217,6 +218,7 @@ export const Queue = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
           {current && (
             <EntrantColumns
               key={current.id}
+              entrantSize={entrantSize}
               left={current?.left || {}}
               right={current?.right || {}}
               setLeft={(left) => setCurrent({ ...current, left })}

@@ -20,6 +20,8 @@ import { QueueSetSelector } from "../../../client/ui/components/queue-set-select
 import { Button } from "../../../client/ui/fields/button";
 import { TGameBackend } from "@bmg-esports/gjallarhorn-tokens";
 import { Label } from "../../ui/fields/label";
+import { GQLMatchSeries } from "../../../@types/challengermode";
+import { Set } from "../../../@types/startgg";
 
 export const Game = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
   const b = useBackend<GameBackend>(TGameBackend);
@@ -32,13 +34,18 @@ export const Game = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
   const [bracket, setBracket] = b.useState("bracket");
   const pushRoundState = b.useState("pushRoundState")[0];
 
+  const isCm = b.useState("isCm")[0];
+
   const sets = b.useState("sets")[0];
   const pushFetchState = b.useState("pushFetchState")[0];
 
   const [setId, setSetId] = b.useState("setId");
+  const [matchSeriesId, setMatchSeriesId] = b.useState("matchSeriesId");
   const [left, setLeft] = b.useState("left");
   const [right, setRight] = b.useState("right");
   const pushGameState = b.useState("pushGameState")[0];
+
+  const entrantSize = b.useState("entrantSize")[0];
 
   return (
     <Card
@@ -72,7 +79,13 @@ export const Game = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
               >
                 Copy From
               </div>
-              <QueueSetSelector onSelect={(set) => setSetId(set.id)} />
+              <QueueSetSelector
+                onSelect={(set) =>
+                  isCm
+                    ? setMatchSeriesId(set.id as string)
+                    : setSetId(set.id as number)
+                }
+              />
             </div>
           </Popup>
           <PushButton
@@ -101,12 +114,22 @@ export const Game = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
               label="Set"
               search
               filterOptions={fuzzySearch}
-              options={sets?.map((set) => ({
-                name: `${set.identifier}: ${
-                  set.slots?.[0]?.entrant?.name ?? "TBD"
-                } - ${set.slots?.[1]?.entrant?.name ?? "TBD"}`,
-                value: String(set.id),
-              }))}
+              options={sets?.map((set) => {
+                const ms = set as GQLMatchSeries;
+                const s = set as Set;
+                return {
+                  name: `${isCm ? ms.ordinal : s.identifier}: ${
+                    (isCm
+                      ? ms.lineups?.[0]?.name
+                      : s.slots?.[0]?.entrant?.name) ?? "TBD"
+                  } - ${
+                    (isCm
+                      ? ms.lineups?.[1]?.name
+                      : s.slots?.[1]?.entrant?.name) ?? "TBD"
+                  }`,
+                  value: String(isCm ? ms.id : s.id),
+                };
+              })}
               renderOption={(props: any, opt, _, className) => {
                 // Had to cast `props` to any since it was "incompatible"
                 // even though it isn't.
@@ -125,7 +148,9 @@ export const Game = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
                     }}
                   >
                     <div style={{ fontWeight: 500, textAlign: "center" }}>
-                      {set?.identifier}
+                      {isCm
+                        ? (set as GQLMatchSeries)?.ordinal
+                        : (set as Set)?.identifier}
                     </div>
                     <div
                       style={{
@@ -135,12 +160,16 @@ export const Game = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
                       }}
                     >
                       <div>
-                        {set?.slots?.[0]?.entrant?.name ?? (
+                        {(isCm
+                          ? (set as GQLMatchSeries)?.lineups?.[0]?.name
+                          : (set as Set)?.slots?.[0]?.entrant?.name) ?? (
                           <i style={{ opacity: 0.3 }}>TBD</i>
                         )}
                       </div>
                       <div>
-                        {set?.slots?.[1]?.entrant?.name ?? (
+                        {(isCm
+                          ? (set as GQLMatchSeries)?.lineups?.[1]?.name
+                          : (set as Set)?.slots?.[1]?.entrant?.name) ?? (
                           <i style={{ opacity: 0.3 }}>TBD</i>
                         )}
                       </div>
@@ -148,13 +177,15 @@ export const Game = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
                   </button>
                 );
               }}
-              value={String(setId)}
-              onChange={(v: any) => setSetId(parseInt(v))}
+              value={String(isCm ? matchSeriesId : setId)}
+              onChange={(v: any) =>
+                isCm ? setMatchSeriesId(v) : setSetId(parseInt(v))
+              }
             />
             <PushButton
               icon
               state={pushFetchState}
-              onClick={() => b.loadSets()}
+              onClick={() => (isCm ? b.loadMatchSerieses() : b.loadSets())}
             >
               <RefreshCw />
             </PushButton>
@@ -196,6 +227,7 @@ export const Game = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
           <EntrantColumns
             withScore
             withSwapSides
+            entrantSize={entrantSize}
             leftScore={left?.score}
             rightScore={right?.score}
             setLeftScore={(score) => setLeft({ ...left, score })}

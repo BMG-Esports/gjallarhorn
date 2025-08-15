@@ -4,7 +4,7 @@ import { Button } from "../../fields/button";
 import styles from "./style.scss";
 import StartGG from "../../icons/startgg";
 import { Input } from "../../fields/input";
-import { useTournament } from "../../contexts/tournament";
+import { useSggTournament, useCmTournament } from "../../contexts/tournament";
 import NoStartGG from "../../icons/no-startgg";
 import { COUNTRIES, LEGENDS } from "../../../../constants";
 import { fuzzySearch, SelectSearchOption } from "react-select-search";
@@ -15,6 +15,8 @@ import { SearchDropdown } from "../../fields/dropdown";
 import { InputRow } from "../../fields/input-row";
 import { Minus, Plus } from "lucide-react";
 import { TTournamentBackend } from "@bmg-esports/gjallarhorn-tokens";
+import { GQLTournamentLineup } from "../../../../@types/challengermode";
+import { Entrant as SEntrant } from "../../../../@types/startgg";
 
 type SetEntrant = (e: Entrant) => void;
 type SetPlayer = (p: Player) => void;
@@ -27,12 +29,13 @@ type EntrantOption = SelectSearchOption & { seed?: number };
  * quirks of react-search-select.
  */
 export function useEntrantOptions(entrants: Entrant[], prefetch = true) {
-  const loading = useRef(new Set<number>());
+  const loading = useRef(new Set<string>());
   const t = useBackend<TournamentBackend>(TTournamentBackend);
-  const eventId = t.useState("tournament")[0]?.eventId;
+  const eventId = t.useState("sggTournament")[0]?.eventId;
   const entrantDebounce = useDebounce(300);
   const [entrantOptions, setEntrantOptions] = useState<EntrantOption[]>([]);
   const [lastQuery, setLastQuery] = useState("");
+  const isCm = t.useState("isChallengerMode")[0];
 
   useEffect(() => {
     if (!prefetch) return;
@@ -40,7 +43,7 @@ export function useEntrantOptions(entrants: Entrant[], prefetch = true) {
       (e) =>
         e.id &&
         !entrantOptions.some((opt) => opt.value === String(e.id)) && // We don't already have info for them
-        !loading.current.has(e.id) // and we're not currently loading them either.
+        !loading.current.has(String(e.id)) // and we're not currently loading them either.
     );
     Promise.all(
       candidates.map((e) => {
@@ -48,17 +51,33 @@ export function useEntrantOptions(entrants: Entrant[], prefetch = true) {
           ? [e.player1.name, e.player2?.name].filter((a) => a).join(" / ")
           : "Loading...";
         entrantOptions.push({ name, value: String(e.id) });
-        loading.current.add(e.id);
-        return t.getEntrantById(e.id);
+        loading.current.add(String(e.id));
+        return isCm
+          ? t.getCmEntrantById(e.id as string)
+          : t.getSggEntrantById(e.id as number);
       })
     ).then((entrants) => {
       entrants
         .filter((e) => e)
-        .map((e) => {
-          const opt = entrantOptions.find((opt) => opt.value === String(e.id));
-          opt.name = e.name;
-          opt.seed = e.initialSeedNum;
-          loading.current.delete(e.id);
+        .forEach((e) => {
+          if (isCm) {
+            const entrant = e as GQLTournamentLineup;
+            const id = entrant.members
+              .map((member) => member.user.userId)
+              .join("_");
+            const opt = entrantOptions.find((opt) => opt.value === id);
+            opt.name = entrant.name;
+            opt.seed = entrant.seed;
+            loading.current.delete(id);
+          } else {
+            const entrant = e as SEntrant;
+            const opt = entrantOptions.find(
+              (opt) => opt.value === String(entrant.id)
+            );
+            opt.name = entrant.name;
+            opt.seed = entrant.initialSeedNum;
+            loading.current.delete(String(entrant.id));
+          }
         });
       if (entrants.length) setEntrantOptions([...entrantOptions]);
     });
@@ -77,11 +96,25 @@ export function useEntrantOptions(entrants: Entrant[], prefetch = true) {
         async () => {
           const entrants = await t.getEntrantsByName(query);
           res(
-            entrants.map((e) => ({
-              name: e.name,
-              value: String(e.id),
-              seed: e.initialSeedNum,
-            }))
+            entrants.map((e) => {
+              if (isCm) {
+                const entrant = e as GQLTournamentLineup;
+                return {
+                  name: entrant.name,
+                  value: entrant.members
+                    .map((member) => member.user.userId)
+                    .join("_"),
+                  seed: entrant.seed,
+                };
+              } else {
+                const entrant = e as SEntrant;
+                return {
+                  name: entrant.name,
+                  value: String(entrant.id),
+                  seed: entrant.initialSeedNum,
+                };
+              }
+            })
           );
         },
         () => res(entrantOptions)
@@ -230,10 +263,10 @@ export function EntrantColumn({
   score?: number;
   setScore?: (s: number) => void;
 }) {
-  const { isStartGG } = entrant;
-  const StartGGIcon = isStartGG ? StartGG : NoStartGG;
+  const { isLive } = entrant;
+  const StartGGIcon = isLive ? StartGG : NoStartGG;
 
-  const disabled = modifyEntrants && isStartGG && !entrant.id;
+  const disabled = modifyEntrants && isLive && !entrant.id;
 
   return (
     <div className={styles.column}>
@@ -243,7 +276,7 @@ export function EntrantColumn({
           <a
             onClick={() => {
               setEntrant({
-                isStartGG: !isStartGG,
+                isLive: !isLive,
                 player1: {},
                 player2: {},
               });
@@ -258,7 +291,7 @@ export function EntrantColumn({
           label="Entrant Select"
           dirtyable={false}
           search
-          disabled={!isStartGG}
+          disabled={!isLive}
           renderOption={(props: any, opt: any, snp, className) => {
             return (
               <button {...props} className={className}>
@@ -282,11 +315,13 @@ export function EntrantColumn({
           value={String(entrant.id)}
           onChange={(v) => {
             if (typeof v !== "string") return;
-            const id = parseInt(v, 10);
+            const id = (v as string).includes("-")
+              ? (v as string)
+              : parseInt(v, 10);
             if (id === entrant.id) return;
             setEntrant({
               id,
-              isStartGG: true,
+              isLive: true,
               player1: {},
               player2: {},
             });
@@ -357,7 +392,7 @@ export function EntrantColumns({
   withScore,
   withSwapSides,
   scoreLabel,
-
+  entrantSize,
   leftScore,
   rightScore,
   setLeftScore,
@@ -376,13 +411,13 @@ export function EntrantColumns({
   withScore?: boolean;
   withSwapSides?: boolean;
   scoreLabel?: string;
-
+  entrantSize?: number;
   leftScore?: number;
   rightScore?: number;
   setLeftScore?: (s: number) => void;
   setRightScore?: (s: number) => void;
 }) {
-  const isTwos = useTournament().entrantSize === 2;
+  const isTwos = entrantSize === 2;
   const swapSides = () => (setLeft(right), setRight(left));
   const { entrantOptions, getEntrantOptions } = useEntrantOptions(
     [left, right],
@@ -446,7 +481,7 @@ export function EntrantPredictions({
   setThird: SetEntrant;
   modifyEntrants?: boolean;
 }) {
-  const isTwos = useTournament().entrantSize === 2;
+  const isTwos = useSggTournament().entrantSize === 2;
   const { entrantOptions, getEntrantOptions } = useEntrantOptions([
     first,
     second,

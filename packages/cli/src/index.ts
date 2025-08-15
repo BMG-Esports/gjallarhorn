@@ -48,6 +48,12 @@ program
       .env("GJALLARHORN_STARTGG")
       .makeOptionMandatory()
   )
+  .addOption(
+    new Option(
+      "-cm, --challengermode <key>",
+      "challengermode API refresh key"
+    ).env("GJALLARHORN_CM_REFRESH_KEY")
+  )
   .action(async (args) => {
     const glob: any = global;
     glob.system = await start({
@@ -57,6 +63,7 @@ program
       OUTPUT_PATH: args.output,
       TEMP_PATH: args.temp,
       STARTGG_API_KEY: args.startgg,
+      CM_REFRESH_KEY: args.challengermode,
     });
     glob.container = container;
     glob.tokens = tokens;

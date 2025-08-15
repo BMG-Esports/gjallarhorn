@@ -10,6 +10,7 @@ export const TOutputService = createToken("OutputService");
 export const TPlayerService = createToken("PlayerService");
 export const TServerService = createToken("ServerService");
 export const TStartGGService = createToken("StartGGService");
+export const TChallengerModeService = createToken("ChallengerModeService");
 export const TSocketService = createToken("SocketService");
 
 // Page Backends

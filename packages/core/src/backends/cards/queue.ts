@@ -15,6 +15,7 @@ import {
 } from "../../constants";
 import { BackendError } from "../../support/errors";
 import {
+  TChallengerModeService,
   TOutputService,
   TPlayerService,
   TQueueBackend,
@@ -23,12 +24,19 @@ import {
 } from "@bmg-esports/gjallarhorn-tokens";
 import { TournamentBackend } from "../pages/tournament";
 import { wrapPushButton } from "../../support/ui";
+import { ChallengerModeService } from "../../services/challenger-mode";
+import {
+  GQLBroadcast,
+  GQLMatchSeries,
+  GQLMatchSeriesState,
+  GQLMatchSeriesStream,
+} from "../../@types/challengermode";
 
 const entrantName = (e: Entrant) =>
   [e?.player1?.name, e?.player2?.name].filter((a) => a).join("/");
 
 export type QueueSet = {
-  id?: number;
+  id?: number | string;
   identifier?: string;
   state?: number;
   customRound?: boolean;
@@ -57,12 +65,14 @@ type State = {
   pushLoadState?: PushButtonState;
   pushFetchState?: PushButtonState;
   pushQueueState?: PushButtonState;
+  entrantSize?: number;
 };
 
 export class QueueBackend extends Backend<State> {
   @inject(TStartGGService) private sgg: StartGGService;
   @inject(TPlayerService) private pService: PlayerService;
   @inject(TOutputService) private output: OutputService;
+  @inject(TChallengerModeService) private cm: ChallengerModeService;
 
   identifier = TQueueBackend;
   state: State = {
@@ -70,6 +80,7 @@ export class QueueBackend extends Backend<State> {
     queues: [],
     startIndex: 0,
     autoFetch: false,
+    entrantSize: 1,
   };
 
   private fetchTimeout: NodeJS.Timeout;
@@ -93,13 +104,16 @@ export class QueueBackend extends Backend<State> {
       }
     }, [this.state.autoFetch]);
 
-    this.on(() => this.loadQueues(), [this.t.state.tournament.tournamentSlug]);
+    this.on(
+      () => this.loadQueues(),
+      [this.t.state.sggTournament.tournamentSlug]
+    );
   }
 
   async loadQueues() {
     await wrapPushButton(
       async () => {
-        let queues: StreamQueue[];
+        let queues: (StreamQueue | GQLBroadcast)[];
         try {
           queues = await this.t.getStreamQueues();
         } catch (e) {
@@ -107,9 +121,18 @@ export class QueueBackend extends Backend<State> {
           throw e;
         }
         this.setState({
-          queues: queues
-            .map((q) => (q?.stream?.streamName || "").toLowerCase())
-            .filter((n) => n),
+          queues: this.t.state.isChallengerMode
+            ? queues
+                .filter((q: GQLBroadcast) => q.streams.length > 0)
+                .map((q: GQLBroadcast) => q?.name)
+            : queues
+                .map((q: StreamQueue) =>
+                  (q?.stream?.streamName || "").toLowerCase()
+                )
+                .filter((n) => n),
+          entrantSize: this.t.state.isChallengerMode
+            ? this.t.state.cmTournament.entrantSize
+            : this.t.state.sggTournament.entrantSize,
         });
       },
       (pushLoadState) => this.setState({ pushLoadState })
@@ -121,22 +144,34 @@ export class QueueBackend extends Backend<State> {
     try {
       await wrapPushButton(
         async () => {
-          let queues: StreamQueue[];
+          let queues: (StreamQueue | GQLBroadcast)[];
           try {
             queues = await this.t.getStreamQueues();
           } catch (e) {
             if (e instanceof BackendError) throw e.nonFatal();
             throw e;
           }
-          const queue = queues.find(
-            (q) =>
-              (q?.stream?.streamName || "").toLowerCase() ===
-              this.state.activeQueue?.toLowerCase()
-          );
+          const queue = this.t.state.isChallengerMode
+            ? queues.find(
+                (q: GQLBroadcast) =>
+                  (q?.name || "").toLowerCase() ===
+                  this.state.activeQueue?.toLowerCase()
+              )
+            : queues.find(
+                (q: StreamQueue) =>
+                  (q?.stream?.streamName || "").toLowerCase() ===
+                  this.state.activeQueue?.toLowerCase()
+              );
           if (!queue)
             throw new BackendError("Couldn't find stream queue!", "Queue");
 
-          await this.populateQueue(queue.sets);
+          await this.populateQueue(
+            this.t.state.isChallengerMode
+              ? ((queue as GQLBroadcast).streams as GQLMatchSeriesStream[]).map(
+                  (s) => s.matchSeries
+                )
+              : (queue as StreamQueue).sets
+          );
         },
         (pushFetchState) => this.setState({ pushFetchState })
       );
@@ -160,7 +195,7 @@ export class QueueBackend extends Backend<State> {
   /**
    * Given the sets from the stream queue, update the local array of queue sets.
    */
-  private async populateQueue(sets: Set[]) {
+  private async populateQueue(sets: (Set | GQLMatchSeries)[]) {
     const { queue } = this.state;
     let { startIndex } = this.state;
     const setLookup = _.keyBy(sets, "id");
@@ -168,13 +203,17 @@ export class QueueBackend extends Backend<State> {
     const localOnly = queue.filter((qs) => !setLookup[qs.id]);
 
     // Fetch incomplete and local sets information
-    let localSetInfo: { [id: string]: Set };
+    let localSetInfo: { [id: string]: Set | GQLMatchSeries };
     try {
       localSetInfo = _.keyBy(
         await Promise.all(
           localOnly
             .filter((qs) => qs.state !== 3)
-            .map((qs) => this.sgg.getSetById(qs.id))
+            .map((qs) =>
+              this.t.state.isChallengerMode
+                ? this.cm.getMatchSeriesById(qs.id! as string)
+                : this.sgg.getSetById(qs.id! as number)
+            )
         ),
         "id"
       );
@@ -185,9 +224,20 @@ export class QueueBackend extends Backend<State> {
 
     const newQueue = await Promise.all([
       ...localOnly
-        .filter((qs) => qs.state === 3 || localSetInfo[qs.id].state === 3)
-        .map((qs) => this.updateQueueSet(qs, localSetInfo[qs.id])), // Only keep complete.
-      ...sets.map((set) => this.updateQueueSet(qsLookup[set.id], set)),
+        .filter((qs) => qs.state === 3 || localSetInfo[qs.id]?.state === 3)
+        .map((qs) =>
+          this.t.state.isChallengerMode
+            ? this.updateQueueSetFromCm(
+                qs,
+                localSetInfo[qs.id] as GQLMatchSeries
+              )
+            : this.updateQueueSetFromSgg(qs, localSetInfo[qs.id] as Set)
+        ), // Only keep complete.
+      ...sets.map((set) =>
+        this.t.state.isChallengerMode
+          ? this.updateQueueSetFromCm(qsLookup[set.id], set as GQLMatchSeries)
+          : this.updateQueueSetFromSgg(qsLookup[set.id], set as Set)
+      ),
     ]);
 
     if (startIndex > newQueue.length - 1) startIndex = newQueue.length - 1;
@@ -199,7 +249,7 @@ export class QueueBackend extends Backend<State> {
    * Update a given queue set using the information from start.gg, careful to
    * not overwrite any operator-modified fields.
    */
-  private async updateQueueSet(qs: QueueSet, set?: Set) {
+  private async updateQueueSetFromSgg(qs: QueueSet, set?: Set) {
     const entrantIds = set?.slots?.map((s) => s?.entrant?.id) || [];
     const newQS: QueueSet = {
       ...qs,
@@ -268,6 +318,109 @@ export class QueueBackend extends Backend<State> {
         newQS.right = {
           id: set.slots[1].entrant.id,
           ...(await this.pService.parseEntrant(set.slots[1].entrant)),
+        };
+      }
+    }
+
+    return newQS;
+  }
+
+  private async updateQueueSetFromCm(qs: QueueSet, ms?: GQLMatchSeries) {
+    const newQS: QueueSet = {
+      ...qs,
+      id: ms?.id || qs?.id,
+      identifier: String(ms?.ordinal) || qs?.identifier,
+      state: ms?.state === GQLMatchSeriesState.COMPLETED ? 3 : 0 || qs?.state,
+      winnerIdx: ms?.results.final
+        ? ms?.results.lineupResults.reduce(
+            (maxIdx, curr, i, arr) =>
+              curr.score > arr[maxIdx].score ? i : maxIdx,
+            0
+          )
+        : qs?.winnerIdx,
+    };
+
+    if (ms) {
+      const aggregateScores: [number, number] = [0, 0];
+
+      ms.matches.forEach((match) =>
+        match.results.lineupResults.forEach(
+          (result) =>
+            (aggregateScores[result.lineupNumber] += result.score ?? 0)
+        )
+      );
+      newQS.leftScore = aggregateScores[0] || 0;
+      newQS.rightScore = aggregateScores[1] || 0;
+    }
+
+    if (!qs?.customRound) {
+      newQS.round = qs?.round;
+
+      // if (ms) {
+      //   let r = this.t.getActuallyGoodRound(ms);
+      //   if (r !== "Grand Final") {
+      //     r = [ms.round > -1 ? "Winners" : "Elimination", r].join(" ");
+      //   }
+      //   newQS.round = r;
+      // }
+    }
+    if (!qs?.customScore) {
+      let score = qs?.score;
+      if (ms) {
+        const aggregateScores: [number, number] = [0, 0];
+
+        ms.matches.forEach((match) =>
+          match.results.lineupResults.forEach(
+            (result) =>
+              (aggregateScores[result.lineupNumber] += result.score ?? 0)
+          )
+        );
+        score =
+          aggregateScores[0] || aggregateScores[1]
+            ? `${aggregateScores[0] || 0} - ${aggregateScores[1] || 0}`
+            : undefined;
+      }
+      newQS.score = score;
+    }
+    if (!qs?.customStartTime) {
+      newQS.startTime = qs?.startTime;
+      if (ms?.startedAt) {
+        newQS.startTime = new Date(ms.startedAt).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+    }
+
+    if (ms) {
+      if (!ms?.lineups[0]?.members && qs?.left?.id) newQS.left = undefined;
+      if (
+        ms?.lineups[0]?.members &&
+        ms?.lineups[0]?.members
+          .map((member) => member.user.userId)
+          .join("_") !== qs?.left?.id
+      ) {
+        const id = ms?.lineups[0]?.members
+          .map((member) => member.user.userId)
+          .join("_");
+        newQS.left = {
+          id,
+          ...(await this.pService.parseLineup(ms.lineups[0])),
+        };
+      }
+      if (!ms?.lineups[1]?.members && qs?.left?.id) newQS.right = undefined;
+      if (
+        ms?.lineups[1]?.members &&
+        ms?.lineups[1]?.members
+          .map((member) => member.user.userId)
+          .join("_") !== qs?.right?.id
+      ) {
+        const id = ms?.lineups[1]?.members
+          .map((member) => member.user.userId)
+          .join("_");
+        newQS.right = {
+          id,
+          ...(await this.pService.parseLineup(ms.lineups[1])),
         };
       }
     }

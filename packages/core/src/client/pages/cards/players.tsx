@@ -28,6 +28,7 @@ export const Players = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
   const [right, setRight] = p.useState("right");
   const [rightScore, setRightScore] = p.useState("rightScore");
   const pushPlayerState = p.useState("pushPlayersState")[0];
+  const entrantSize = p.useState("entrantSize")[0];
 
   const g = useBackend<GameBackend>(TGameBackend);
   const game = {
@@ -37,9 +38,9 @@ export const Players = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
 
   const [copyOpen, setCopyOpen] = useState(false);
 
-  const loadEntrants = (leftId: number, rightId: number) => {
-    if (leftId !== left?.id) setLeft({ id: leftId, isStartGG: true });
-    if (rightId !== right?.id) setRight({ id: rightId, isStartGG: true });
+  const loadEntrants = (leftId: number | string, rightId: number | string) => {
+    if (leftId !== left?.id) setLeft({ id: leftId, isLive: true });
+    if (rightId !== right?.id) setRight({ id: rightId, isLive: true });
     setCopyOpen(false);
   };
 
@@ -107,6 +108,7 @@ export const Players = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
             withScore
             withSwapSides
             scoreLabel="Lifetime Score"
+            entrantSize={entrantSize}
             middle={
               <PushButton
                 dirty={dirty}

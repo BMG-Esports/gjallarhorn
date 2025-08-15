@@ -13,6 +13,7 @@ import {
   getLegendOffset,
   getLegendSplash,
   IMAGES,
+  REGION_ID_TO_REGION,
   SLUG_TO_REGION,
 } from "../../constants";
 import { OutputService } from "../../services/output";
@@ -21,6 +22,7 @@ import { StartGGService } from "../../services/startgg";
 import { Backend } from "../../support/backend";
 import { BackendError } from "../../support/errors";
 import {
+  TChallengerModeService,
   TGameBackend,
   TOutputService,
   TPlayerService,
@@ -31,10 +33,12 @@ import { inject } from "inversify";
 
 import { TournamentBackend } from "../pages/tournament";
 import { wrapPushButton } from "../../support/ui";
+import { ChallengerModeService } from "../../services/challenger-mode";
+import { GQLMatchSeries } from "../../@types/challengermode";
 
 const emptyPlayer = (): Player => ({});
 const emptyEntrant = (): Entrant => ({
-  isStartGG: true,
+  isLive: true,
   player1: emptyPlayer(),
   player2: emptyPlayer(),
 });
@@ -82,8 +86,9 @@ export const emptyPostGame = () => ({
 });
 
 type State = {
-  sets: Set[];
+  sets: (Set | GQLMatchSeries)[];
   setId?: number;
+  matchSeriesId?: string;
   round: string;
   region: string;
   bracket: string;
@@ -96,10 +101,13 @@ type State = {
   pushFetchState?: PushButtonState;
   pushRoundState?: PushButtonState;
   pushGameState?: PushButtonState;
+  isCm: boolean;
+  entrantSize: number;
 };
 
 export class GameBackend extends Backend<State> {
   @inject(TStartGGService) private sgg: StartGGService;
+  @inject(TChallengerModeService) private cm: ChallengerModeService;
   @inject(TPlayerService) private pService: PlayerService;
   @inject(TOutputService) private output: OutputService;
 
@@ -111,9 +119,10 @@ export class GameBackend extends Backend<State> {
     round: "",
     region: "",
     bracket: "Winners Bracket",
-
+    isCm: false,
     left: emptyEntrant(),
     right: emptyEntrant(),
+    entrantSize: 1,
   };
 
   constructor(@inject(TTournamentBackend) private t: TournamentBackend) {
@@ -123,11 +132,14 @@ export class GameBackend extends Backend<State> {
   }
 
   protected listeners(): void {
-    const { phaseGroupId, tournamentSlug } = this.t.state.tournament;
-    const { setId } = this.state;
-
+    const { setId, matchSeriesId } = this.state;
+    const { phaseGroupId, tournamentSlug } = this.t.state.sggTournament;
+    const { roundNum, tournamentId } = this.t.state.cmTournament;
+    const regionId =
+      this.t.state.cmTournamentMeta?.settings.gameSessionSettings.Region;
     this.on(() => {
       if (!tournamentSlug) return;
+      this.setState({ isCm: false });
       SLUG_TO_REGION.forEach((region, slugPart) => {
         if (tournamentSlug.includes(slugPart)) {
           this.setState({ region });
@@ -136,8 +148,23 @@ export class GameBackend extends Backend<State> {
     }, [tournamentSlug]);
 
     this.on(() => {
+      if (!tournamentId) return;
+      this.setState({ isCm: true });
+      REGION_ID_TO_REGION.forEach((region, id) => {
+        if (regionId === id) {
+          this.setState({ region });
+          return;
+        }
+      });
+    }, [tournamentId]);
+
+    this.on(() => {
       if (phaseGroupId) this.loadSets();
     }, [phaseGroupId]);
+
+    this.on(() => {
+      if (roundNum) this.loadMatchSerieses();
+    }, [roundNum]);
 
     this.on(() => {
       if (!setId) return this.setState({ round: "" });
@@ -149,20 +176,61 @@ export class GameBackend extends Backend<State> {
           throw e;
         });
     }, [setId]);
+
+    this.on(() => {
+      if (!matchSeriesId) return this.setState({ round: "" });
+      this.cm
+        .getMatchSeriesById(matchSeriesId)
+        .then((matchSeries) => this.loadMatchSeries(matchSeries))
+        .catch((e) => {
+          if (e instanceof BackendError) throw e.nonFatal();
+          throw e;
+        });
+    }, [matchSeriesId]);
   }
 
   async loadSets() {
     await wrapPushButton(
       async () => {
-        const { phaseGroupId } = this.t.state.tournament;
+        const { phaseGroupId } = this.t.state.sggTournament;
         if (!phaseGroupId) {
           this.setState({ sets: [], setId: undefined });
           throw new BackendError("No active phase group!", "Game");
         }
         try {
-          await this.sgg
-            .getSetsInPhaseGroup(phaseGroupId)
-            .then((sets) => this.setState({ sets }));
+          await this.sgg.getSetsInPhaseGroup(phaseGroupId).then((sets) =>
+            this.setState({
+              sets,
+              entrantSize: this.t.state.sggTournament.entrantSize,
+            })
+          );
+        } catch (e) {
+          if (e instanceof BackendError) throw e.nonFatal();
+          throw e;
+        }
+      },
+      (pushFetchState) => this.setState({ pushFetchState })
+    );
+  }
+
+  async loadMatchSerieses() {
+    await wrapPushButton(
+      async () => {
+        const { tournamentId, stageNum, bracketType } =
+          this.t.state.cmTournament;
+        if (!bracketType) {
+          this.setState({ sets: [], matchSeriesId: undefined });
+          throw new BackendError("No active round!", "Game");
+        }
+        try {
+          await this.cm
+            .getMatchSeriesesInBracket(tournamentId, stageNum, bracketType)
+            .then((matchSerieses: GQLMatchSeries[]) => {
+              this.setState({
+                sets: matchSerieses,
+                entrantSize: this.t.state.cmTournament.entrantSize,
+              });
+            });
         } catch (e) {
           if (e instanceof BackendError) throw e.nonFatal();
           throw e;
@@ -185,6 +253,21 @@ export class GameBackend extends Backend<State> {
     ]);
   }
 
+  private async loadMatchSeries(matchSeries: GQLMatchSeries) {
+    if (!matchSeries) {
+      throw new BackendError("Could not find set information.", "Game");
+    }
+
+    this.setState({
+      round: this.t.getRoundName(),
+      bracket: this.t.getBracketName(),
+    });
+    await Promise.all([
+      this.loadMatch("left", 0, matchSeries),
+      this.loadMatch("right", 1, matchSeries),
+    ]);
+  }
+
   private async loadSlot(side: "left" | "right", slot: SetSlot) {
     const { entrant, standing } = slot;
     if (!entrant) {
@@ -198,8 +281,35 @@ export class GameBackend extends Backend<State> {
 
     this.setState({
       [side]: {
-        isStartGG: true,
+        isLive: true,
         id: entrant.id,
+        score,
+        ...players,
+      },
+    });
+  }
+
+  private async loadMatch(
+    side: "left" | "right",
+    i: number,
+    matchSeries: GQLMatchSeries
+  ) {
+    const lineup = matchSeries.lineups[i];
+    const standing = matchSeries.results.lineupResults[i];
+
+    if (!lineup) {
+      return this.setState({
+        [side]: emptyEntrant(),
+      });
+    }
+
+    const players = await this.pService.parseLineup(lineup);
+    const score = standing?.score || 0;
+
+    this.setState({
+      [side]: {
+        isLive: true,
+        id: lineup.members.map((member) => member.user.userId).join("_"),
         score,
         ...players,
       },

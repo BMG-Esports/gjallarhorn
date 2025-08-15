@@ -9,6 +9,9 @@ import {
   getPlayer,
   getPlayerMatches,
   getPlayerPR,
+  getPlayerByCmId,
+  getPlayerBySggId,
+  getPlayerByBrawlhallaId,
   getPlayerPlacements,
   getPlayerRecentLegend,
 } from "@bmg-esports/sdk";
@@ -42,7 +45,7 @@ export class DBService {
   async getPlayerPR(id: number, gameMode: number): Promise<PRInformation> {
     try {
       const res = await getPlayerPR({
-        entrantSmashId: id,
+        playerIds: [id],
         gameMode,
       });
       this.status.recordDB();
@@ -64,14 +67,14 @@ export class DBService {
 
   // TODO: Migrate getMatchup to the new API.
   async getMatchup(
-    entrant1SmashIds: number[],
-    entrant2SmashIds: number[],
+    entrant1PlayerIds: number[],
+    entrant2PlayerIds: number[],
     gameMode: number
   ): Promise<[number, number]> {
     try {
       const matchup = await getMatchup({
-        entrant1SmashIds,
-        entrant2SmashIds,
+        entrant1PlayerIds,
+        entrant2PlayerIds,
         gameMode,
       });
       this.status.recordDB();
@@ -81,8 +84,8 @@ export class DBService {
         return [0, 0];
       }
       throw new BackendError(
-        `Error fetching player matchup ${entrant1SmashIds
-          .concat(entrant2SmashIds)
+        `Error fetching player matchup ${entrant1PlayerIds
+          .concat(entrant2PlayerIds)
           .join(", ")}`,
         "DB",
         true,
@@ -93,7 +96,7 @@ export class DBService {
 
   async getPlayer(id: number) {
     try {
-      const player = await getPlayer({ smashId: id });
+      const player = await getPlayer({ playerId: id });
       this.status.recordDB();
       return player;
     } catch (e) {
@@ -106,10 +109,55 @@ export class DBService {
     }
   }
 
+  async getPlayerByCmId(id: string) {
+    try {
+      const player = await getPlayerByCmId({ cmPlayerId: id });
+      this.status.recordDB();
+      return player;
+    } catch (e) {
+      throw new BackendError(
+        "Error when fetching player information by cmId.",
+        "DB",
+        true,
+        e
+      );
+    }
+  }
+
+  async getPlayerBySggId(id: number) {
+    try {
+      const player = await getPlayerBySggId({ sggPlayerId: id });
+      this.status.recordDB();
+      return player;
+    } catch (e) {
+      throw new BackendError(
+        "Error when fetching player information by sggId.",
+        "DB",
+        true,
+        e
+      );
+    }
+  }
+
+  async getPlayerByBhId(id: number) {
+    try {
+      const player = await getPlayerByBrawlhallaId({ brawlhallaId: id });
+      this.status.recordDB();
+      return player;
+    } catch (e) {
+      throw new BackendError(
+        "Error when fetching player information by bhId.",
+        "DB",
+        true,
+        e
+      );
+    }
+  }
+
   async getPlayerEvents(id: number, gameMode: number) {
     try {
       const placements = await getPlayerPlacements({
-        entrantSmashIds: [id],
+        playerIds: [id],
         gameMode,
         isOfficial: true,
       });
@@ -125,9 +173,9 @@ export class DBService {
     }
   }
 
-  async getPlayerEventMatches(id: number, slug: string) {
+  async getPlayerEventMatches(id: number, tournamentId: string) {
     try {
-      const matches = await getPlayerMatches({ entrantSmashIds: [id], slug });
+      const matches = await getPlayerMatches({ playerIds: [id], tournamentId });
       this.status.recordDB();
       return matches.playerMatches;
     } catch (e) {
