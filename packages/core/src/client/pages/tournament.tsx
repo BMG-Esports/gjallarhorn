@@ -7,7 +7,10 @@ import { TournamentSelector } from "../ui/components/tournament-selector";
 import { PushButton } from "../ui/components/push-button";
 import { CardHost, CardHostHandle } from "../ui/components/cards";
 import { JumpTo } from "../ui/components/cards/jump-to";
-import { SggTournamentProvider } from "../ui/contexts/tournament";
+import {
+  SggTournamentProvider,
+  CmTournamentProvider,
+} from "../ui/contexts/tournament";
 import { SystemWidget } from "../ui/components/system-widget";
 import { AutoToggle } from "../ui/fields/auto-toggle";
 
@@ -39,45 +42,90 @@ export default function TournamentPage() {
   const host = useRef<CardHostHandle>();
 
   return (
-    <SggTournamentProvider value={sggTournament}>
-      <Nav>
-        <TournamentSelector
-          tournament={isCm ? cmTournament : sggTournament}
-          // @ts-ignore
-          setTournament={isCm ? setCmTournament : setSggTournament}
-          meta={isCm ? cmMeta : sggMeta}
-          isCm={isCm}
-          setIsCm={setIsCm}
-        />{" "}
-        <Spacer />
-        <AutoToggle
-          enabled={autoBrackets}
-          setEnabled={setAutoBrackets}
-          label="2m"
-        >
-          <PushButton
-            big
-            disabled={
-              isCm ? !cmTournament.tournamentId : !sggTournament.eventId
-            }
-            state={pushBracketState}
-            onClick={() => t.pushBrackets()}
-          >
-            Push Brackets
-          </PushButton>
-        </AutoToggle>
-        <JumpTo
-          cards={filteredCards}
-          jumpTo={(id) => host.current.jumpTo(id)}
-        />
-        <SystemWidget />
-      </Nav>
-      <CardHost
-        prefix="tournament"
-        ref={host}
-        cards={filteredCards}
-        mode="column"
-      />
-    </SggTournamentProvider>
+    <>
+      {isCm ? (
+        <CmTournamentProvider value={cmTournament}>
+          <Nav>
+            <TournamentSelector
+              tournament={isCm ? cmTournament : sggTournament}
+              // @ts-ignore
+              setTournament={isCm ? setCmTournament : setSggTournament}
+              meta={isCm ? cmMeta : sggMeta}
+              isCm={isCm}
+              setIsCm={setIsCm}
+            />{" "}
+            <Spacer />
+            <AutoToggle
+              enabled={autoBrackets}
+              setEnabled={setAutoBrackets}
+              label="2m"
+            >
+              <PushButton
+                big
+                disabled={
+                  isCm ? !cmTournament.tournamentId : !sggTournament.eventId
+                }
+                state={pushBracketState}
+                onClick={() => t.pushBrackets()}
+              >
+                Push Brackets
+              </PushButton>
+            </AutoToggle>
+            <JumpTo
+              cards={filteredCards}
+              jumpTo={(id) => host.current.jumpTo(id)}
+            />
+            <SystemWidget />
+          </Nav>
+          <CardHost
+            prefix="tournament"
+            ref={host}
+            cards={filteredCards}
+            mode="column"
+          />
+        </CmTournamentProvider>
+      ) : (
+        <SggTournamentProvider value={sggTournament}>
+          <Nav>
+            <TournamentSelector
+              tournament={isCm ? cmTournament : sggTournament}
+              // @ts-ignore
+              setTournament={isCm ? setCmTournament : setSggTournament}
+              meta={isCm ? cmMeta : sggMeta}
+              isCm={isCm}
+              setIsCm={setIsCm}
+            />{" "}
+            <Spacer />
+            <AutoToggle
+              enabled={autoBrackets}
+              setEnabled={setAutoBrackets}
+              label="2m"
+            >
+              <PushButton
+                big
+                disabled={
+                  isCm ? !cmTournament.tournamentId : !sggTournament.eventId
+                }
+                state={pushBracketState}
+                onClick={() => t.pushBrackets()}
+              >
+                Push Brackets
+              </PushButton>
+            </AutoToggle>
+            <JumpTo
+              cards={filteredCards}
+              jumpTo={(id) => host.current.jumpTo(id)}
+            />
+            <SystemWidget />
+          </Nav>
+          <CardHost
+            prefix="tournament"
+            ref={host}
+            cards={filteredCards}
+            mode="column"
+          />
+        </SggTournamentProvider>
+      )}
+    </>
   );
 }

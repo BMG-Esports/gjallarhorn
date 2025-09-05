@@ -451,7 +451,7 @@ export const LEGEND_RENDER_OFFSETS: {
   PLAGUE_KNIGHT: { offsetX: -75, offsetZ: 46 },
   PO: { offsetX: 130, offsetZ: 18 },
   PRINCESS_BUBBLEGUM: { offsetX: 68, offsetZ: -58 },
-  PRIYAO: { offsetX: 0, offsetZ: 0 },
+  PRIYA: { offsetX: 0, offsetZ: 0 },
   QUEEN_NAI: { offsetX: 26, offsetZ: 284 },
   RAGNIR: { offsetX: -156, offsetZ: 144 },
   RAPHAEL: { offsetX: 78, offsetZ: 0 },
