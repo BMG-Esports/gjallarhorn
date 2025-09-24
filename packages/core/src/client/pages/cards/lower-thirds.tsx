@@ -182,13 +182,14 @@ export const LowerThirds = forwardRef<HTMLDivElement, CardProps>(
 
     const leftPlayer = g.useState("left")[0];
     const rightPlayer = g.useState("right")[0];
-    const tourney = t.useState("sggTournamentMeta")[0];
+    const sggTourney = t.useState("sggTournamentMeta")[0];
     const cmTourney = t.useState("cmTournamentMeta")[0];
     const [isCm, setIsCm] = t.useState("isChallengerMode");
 
     const autoFillChampion = () => {
       const tourneyName =
-        (isCm ? cmTourney : tourney)?.name?.toLocaleUpperCase() ?? "TOURNAMENT";
+        (isCm ? cmTourney : sggTourney)?.name?.toLocaleUpperCase() ??
+        "TOURNAMENT";
       if (leftPlayer && rightPlayer) {
         const isLeftWinner = (leftPlayer.score ?? 0) > (rightPlayer.score ?? 0);
         const winningPlayer = isLeftWinner ? leftPlayer : rightPlayer;
