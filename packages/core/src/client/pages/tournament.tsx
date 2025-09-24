@@ -29,11 +29,11 @@ type TournamentProviderWrapperProps = {
 };
 
 const TournamentProviderWrapper = ({
-  isCM,
+  isCM: isCm,
   value,
   children,
 }: TournamentProviderWrapperProps) => {
-  return isCM ? (
+  return isCm ? (
     <CmTournamentProvider value={value}>{children}</CmTournamentProvider>
   ) : (
     <SggTournamentProvider value={value}>{children}</SggTournamentProvider>
@@ -75,7 +75,7 @@ export default function TournamentPage() {
           meta={meta}
           isCm={isCm}
           setIsCm={setIsCm}
-        />{" "}
+        />
         <Spacer />
         <AutoToggle
           enabled={autoBrackets}
