@@ -152,7 +152,9 @@ Stats API (`db.ts`)
 
 ## Contributors
 
-[![](https://github.com/preyneyv.png?size=50)](https://github.com/preyneyv)
-[![](https://github.com/arnabp.png?size=50)](https://github.com/arnabp)
-[![](https://github.com/BuildGayFromSource.png?size=50)](https://github.com/BuildGayFromSource)
-[![](https://github.com/qiliao17.png?size=50)(https://github.com/qiliao17)]
+<p>
+  <a href="https://github.com/preyneyv"><img src="https://github.com/preyneyv.png" width="50" /></a>
+  <a href="https://github.com/arnabp"><img src="https://github.com/arnabp.png" width="50" /></a>
+  <a href="https://github.com/BuildGayFromSource"><img src="https://github.com/BuildGayFromSource.png" width="50" /></a>
+  <a href="https://github.com/qiliao17"><img src="https://github.com/qiliao17.png" width="50" /></a>
+<p>
