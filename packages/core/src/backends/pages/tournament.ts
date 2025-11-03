@@ -68,7 +68,7 @@ export class TournamentBackend extends Backend<State> {
       tournamentId:
         process.env.NODE_ENV === "production"
           ? ""
-          : "e79eced3-9fa1-488e-f8e3-08dc8aea98437",
+          : "eb84e618-2941-42b7-09c7-08dd66f60e0c",
     },
     isChallengerMode: true,
     autoBrackets: false,

@@ -1,10 +1,10 @@
 # `Gjallarhorn`
 
-Gjallarhorn is a tool for Brawlhalla community tournament producers to generate formatted JSON files for esports tournament stream overlays. Gjallarhorn can generate JSON files for multiple use cases, including tickers, casters, lower thirds, queues, players, and games. It pulls data from start.gg as well as Brawlhalla's Stats API.
+Gjallarhorn is a tool for Brawlhalla community tournament producers to generate JSON files for stream overlays. Gjallarhorn can serve files for multiple use cases, including rotating tickers, caster information, queued games, pop-ins, and more. Gjallarhorn supports manual data entry as well as fetching data from Start.gg or Challengermode, supplemented by Brawlhalla's Stats API.
 
 ## Getting Started
 
-You will need a start.gg API key to use Gjallarhorn. If you don't have one already, get one at https://developer.start.gg/docs/authentication.
+Start.gg API key to use Gjallarhorn. If you don't have one already, get one at [Start.gg's Developer Portal](https://developer.start.gg/docs/authentication/).
 
 To start Gjallarhorn, run the following commands in the project:
 
@@ -22,51 +22,31 @@ Then, launch the dashboard at http://localhost:3000.
 <details>
   <summary>Usage</summary>
 
-You will find 6 different cards on the dashboard: Casters, Game, Ticker, Players, Queue, and Lower Thirds. You can fill out the cards with the details you want on the overlay and hit "Push". You will find the output files served over http at http://localhost:3000/api/json or the raw JSON files in `packages/cli/output`.
+To begin using Gjallarhorn, you can connect with and import a tournament from Start.gg or Challengermode. This tournament is listed in the header, and can be edited by clicking the pencil.
 
-![A Gjallarhorn interface filled in](images/gjallarhorn.png)
+You will find 6 different cards on the dashboard: Casters, Game, Ticker, Players, Queue, and Lower Thirds. Each card has a title bar that contains a Push button and an arrow. Right clicking on the title bar will open a dropdown to change the color of the card. Dragging the title bar will allow you to move the card. Clicking on the arrow will close the card and move it to the bottom of the screen.
 
-You can reorder the cards by dragging the title bar. A dotted line will show where the card will be placed.
+Clicking the Push button on a card will create a JSON file served over HTTP on http://localhost:3000/api/json and saved locally at `packages/cli/output`. These JSON files can be connected to broadcasting software (vMix or OBS with applicable plugins) to allow for seamless usage.
 
-![The Player card being reordered](images/gjallardrag.png)
-
-You can also recolor each card by right clicking on the title bar.
-
-![The Lower Thirds card with the color modal open](images/gjallarcolors.png)
-
-If a card is unnecessary or temporarily unneeded, you can minimize it by clicking the arrow at the right of each card next to the push button.
-
-These JSON files can be connected to broadcasting software (vMix or OBS with applicable plugins) to allow for seamless editing and usage of data. However, not all of this data will be useful or even applicable to all organizers, and you can decide what data you'd like to use. Feel free to disregard any of the forms or data that are unnecessary for your production environment.
+However, not all of this data will be useful or even applicable to all organizers. Gjallarhorn is designed to be modular - use whatever is necessary for your workflow and tournament.
 
 </details>
 
 <details>
   <summary>Header</summary>
 
-![The Gjallarhorn header](images/gjallarheader.png)
+In the top left corner, the current tournament is indicated next to the hamburger menu. The pencil icon opens a text box where you can change the active tournament. Enter the ID of a vaild tournament to fetch information from it. A valid ID is a slug for Start.gg tournaments (“brawlhalla-world-championship-expo-2023”), and an UUID for Challengermode tournaments ("eb84e618-2941-42b7-09c7-08dd66f60e0c").
 
-In the top left corner, the current tournament is indicated next to the hamburger menu. The pencil icon opens a text box where you can change the active tournament. Enter the tournament’s unique slug (“brawlhalla-world-championship-expo-2023”) to switch to that tournament. Shorthand forms also exist for certain tournaments (“bcx”). Clicking on the game mode (In this example, Brawlhalla Championship 1v1) allows you to switch between different tournament game modes if they exist. The pools can also be swapped similarly.
+Push Brackets will output a JSON file to be used in bracket images. You can have these pushed every two minutes by clicking the timer next to the Push button.
 
-Push Brackets will output a JSON file to be used in bracket images. You can have these pushed every two minutes by clicking the timer next to the button.
+Hovering over the checkmark icon next to the search bar shows you the application latency and the rate limits for both the database and Start.gg. If your Gjallarhorn instance is unexpectedly terminated, the icon will change and turn yellow.
 
-![A green checkmark](images/gjallarcheck.png)
-
-Hovering over the checkmark icon next to the search bar shows you the application latency and the rate limits for both the database and start.gg.
-
-![A yellow disconnection indicator](images/gjallardc.png)
-
-If your Gjallarhorn instance is unexpectedly terminated, the icon will change and turn yellow.
-
-![An active user icon](images/gjallaruser.png)
-
-Hovering over this icon will show checkboxes that enable light mode and push notifications for possible errors respectively.
+Hovering over the user icon will show checkboxes that enable light mode and push notifications for possible errors respectively.
 
 </details>
 
 <details>
   <summary>Casters</summary>
-
-![The Casters card](images/gjallarcasters.png)
 
 You can enter up to four different casters, with text boxes for their name, social media accounts, and pronouns.
 
@@ -75,47 +55,37 @@ You can enter up to four different casters, with text boxes for their name, soci
 <details>
   <summary>Game</summary>
 
-![The Game card](images/gjallargame.png)
-
-This card can be input manually, or you can use the Set dropdown to populate text with a start.gg match. You can also import a set from the Queue card by clicking on the clipboard next to Push Round. Rounds won can be incremented using the plus and minus buttons next to Left and Right.
+This card can be input manually, or you can use the Set dropdown to populate text with a Start.gg match. You can also import a set from the Queue card by clicking on the clipboard next to Push Round button. Rounds won can be incremented using the plus and minus buttons next to Left and Right.
 
 </details>
 
 <details>
   <summary>Players</summary>
 
-![The Player card](images/gjallarplayers.png)
-
-This card can be input manually. You can also import players from the Game card or the Queue card with the clipboard button next to Push. When importing players, Gjallarhorn will attempt to populate the Lifetime Score textbox with information from the Stats API. It can also be manually incremented with the plus and minus buttons. The legend loaded for each player will be the most recently reported legend in the current tournament (if applicable). Otherwise, it will be the last legend the player ever reported.
+This card can be input manually. You can also import players from the Game card or the Queue card with the clipboard button next to the Push button. When importing players, Gjallarhorn will attempt to populate the Lifetime Score textbox with information from the Stats API. It can also be manually incremented with the plus and minus buttons. The legend loaded for each player will be the most recently reported legend in the current tournament (if applicable). Otherwise, it will be the last legend the player ever reported.
 
 </details>
 
 <details>
   <summary>Ticker</summary>
 
-![The Ticker Card](images/gjallarticker.png)
-
-Used to create tickers (as the name implies). These tickers can be manually moved by dragging the vertical arrow icon next to the subject, and can be randomly shuffled by hitting the shuffle button. By clicking the timer next to shuffle, the tickers will automatically shuffle every five minutes.
+Used to create rotating tickers. These tickers can be manually moved by dragging the vertical arrow icon next to the subject, and can be randomly shuffled by hitting the shuffle button. By clicking the timer next to shuffle, the tickers will automatically shuffle every five minutes.
 
 </details>
 
 <details>
   <summary>Queue</summary>
 
-![The Queue card](images/gjallarqueue.png)
-
-The Queue card pulls queues from a start.gg tournament. In order for this card to be useful, your tournament must have at least one active queue. You can continuously fetch the currently active queue every sixty seconds by clicking the timer next to Fetch Queue.
+The Queue card pulls stream queues from a tournament. In order for this card to be useful, your tournament must have at least one active queue. You can continuously fetch the active queue every sixty seconds by clicking the timer next to Fetch Queue.
 
 </details>
 
 <details>
   <summary>Lower Thirds</summary>
 
-![The Lower Third card](images/gjallarlowerthird.png)
+The Lower Thirds card can be used to make mock X (formerly Twitter) posts, Twitch messages, Champion graphics, and more.
 
-The Lower Thirds card has five sections: Twitter, Twitch, Message, Champion, and Preshow.
-
-Champion can be autofilled by clicking the autofill button. It will use the tournament name along with the game mode, and the winner’s name will be in the message box.
+The Champion section can be autofilled by clicking the Autofill button next to event. It will use the tournament name and game mode in the event textbox, and the winner’s name will be in the message box.
 
 You can create presets for each section. You can also delete the most recently created preset if it was added in error.
 
