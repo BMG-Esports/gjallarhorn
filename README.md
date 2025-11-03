@@ -4,14 +4,24 @@ Gjallarhorn is a tool for Brawlhalla community tournament producers to generate 
 
 ## Getting Started
 
-Start.gg API key to use Gjallarhorn. If you don't have one already, get one at [Start.gg's Developer Portal](https://developer.start.gg/docs/authentication/).
+You will need one of a Start.gg or Challengermode API key to use Gjallarhorn. If you don't have one already, get one at [Start.gg's Developer Portal](https://developer.start.gg/docs/authentication/) or [Challengermode's Developer Portal](https://www.challengermode.com/developers/applications).
 
-To start Gjallarhorn, run the following commands in the project:
+To start using Gjallarhorn, run these commands in the Gjallarhorn folder to install the dependencies and build the front-end:
 
 ```sh
 npm install
 npm run build
+```
+
+Then, launch the process with your API keys as flags.
+
+```sh
+# Start.gg only
 node . -s [your-startgg-key-here]
+# Challengermode only
+node . -cm [your-challengermode-key-here]
+# Both Start.gg and Challengermode
+node . -s [] -cm []
 ```
 
 > [!NOTE]
@@ -35,7 +45,7 @@ However, not all of this data will be useful or even applicable to all organizer
 <details>
   <summary>Header</summary>
 
-In the top left corner, the current tournament is indicated next to the hamburger menu. The pencil icon opens a text box where you can change the active tournament. Enter the ID of a vaild tournament to fetch information from it. A valid ID is a slug for Start.gg tournaments (“brawlhalla-world-championship-expo-2023”), and an UUID for Challengermode tournaments ("eb84e618-2941-42b7-09c7-08dd66f60e0c").
+In the top left corner, the current tournament is indicated next to the hamburger menu. The pencil icon opens a text box where you can change the active tournament. Enter the ID of a vaild tournament to fetch information from it. A valid ID is a slug for Start.gg tournaments (`brawlhalla-world-championship-expo-2023`), and an UUID for Challengermode tournaments (`eb84e618-2941-42b7-09c7-08dd66f60e0c`).
 
 Push Brackets will output a JSON file to be used in bracket images. You can have these pushed every two minutes by clicking the timer next to the Push button.
 
