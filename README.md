@@ -1,4 +1,4 @@
-# `Gjallarhorn`
+# Gjallarhorn
 
 Gjallarhorn is a tool for Brawlhalla community tournament producers to generate JSON files for stream overlays. Gjallarhorn can serve files for multiple use cases, including rotating tickers, caster information, queued games, pop-ins, and more. Gjallarhorn supports manual data entry as well as fetching data from Start.gg or Challengermode, supplemented by Brawlhalla's Stats API.
 
@@ -155,3 +155,4 @@ Stats API (`db.ts`)
 [![](https://github.com/preyneyv.png?size=50)](https://github.com/preyneyv)
 [![](https://github.com/arnabp.png?size=50)](https://github.com/arnabp)
 [![](https://github.com/BuildGayFromSource.png?size=50)](https://github.com/BuildGayFromSource)
+[![](https://github.com/qiliao17.png?size=50)(https://github.com/qiliao17)]
