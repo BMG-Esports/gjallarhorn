@@ -200,15 +200,14 @@ export const LowerThirds = forwardRef<HTMLDivElement, CardProps>(
           isDoubles || isTrios ? winningPlayer.player2?.name : null,
           isTrios ? winningPlayer.player3?.name : null,
         ].filter((n) => n);
-        const winningPlayerName =
-          winningNames.length > 1
-            ? `${winningNames.slice(0, -1).join(", ")} AND ${
-                winningNames[winningNames.length - 1]
-              }`
-            : winningNames[0];
-        const gameMode = isTrios ? "TRIOS" : isDoubles ? "DOUBLES" : "SINGLES";
+        const winningPlayerName = isTrios
+          ? winningNames.join(", ")
+          : winningNames.join(" AND ");
+        const gameMode = isTrios ? "" : isDoubles ? "DOUBLES" : "SINGLES";
         const champText = isDoubles || isTrios ? "CHAMPIONS" : "CHAMPION";
-        const eventString = `${tourneyName} ${gameMode} ${champText}`;
+        const eventString = [tourneyName, gameMode, champText]
+          .filter(Boolean)
+          .join(" ");
         states.champion[0][1]({
           ...states.champion[0][1],
           title: eventString,
