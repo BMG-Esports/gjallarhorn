@@ -44,9 +44,9 @@ program
       .argParser((v) => path.resolve(v))
   )
   .addOption(
-    new Option("-s, --startgg <key>", "start.gg API key")
-      .env("GJALLARHORN_STARTGG")
-      .makeOptionMandatory()
+    new Option("-s, --startgg <key>", "start.gg API key").env(
+      "GJALLARHORN_STARTGG"
+    )
   )
   .addOption(
     new Option(
