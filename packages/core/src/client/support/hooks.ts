@@ -140,4 +140,6 @@ export function useUpdate(effect: () => void, dependencies: any[] = []) {
 }
 
 export const entrantName = (e: Entrant) =>
-  [e?.player1?.name, e?.player2?.name].filter((a) => a).join("/");
+  [e?.player1?.name, e?.player2?.name, e?.player3?.name]
+    .filter((a) => a)
+    .join("/");

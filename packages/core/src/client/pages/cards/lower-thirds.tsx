@@ -194,11 +194,20 @@ export const LowerThirds = forwardRef<HTMLDivElement, CardProps>(
         const isLeftWinner = (leftPlayer.score ?? 0) > (rightPlayer.score ?? 0);
         const winningPlayer = isLeftWinner ? leftPlayer : rightPlayer;
         const isDoubles = !!winningPlayer.player2?.name;
-        let winningPlayerName = winningPlayer.player1?.name ?? "-";
-        if (isDoubles)
-          winningPlayerName += ` AND ${winningPlayer.player2?.name}`;
-        const gameMode = isDoubles ? "DOUBLES" : "SINGLES";
-        const champText = isDoubles ? "CHAMPIONS" : "CHAMPION";
+        const isTrios = !!winningPlayer.player3?.name;
+        const winningNames = [
+          winningPlayer.player1?.name ?? "-",
+          isDoubles || isTrios ? winningPlayer.player2?.name : null,
+          isTrios ? winningPlayer.player3?.name : null,
+        ].filter((n) => n);
+        const winningPlayerName =
+          winningNames.length > 1
+            ? `${winningNames.slice(0, -1).join(", ")} AND ${
+                winningNames[winningNames.length - 1]
+              }`
+            : winningNames[0];
+        const gameMode = isTrios ? "TRIOS" : isDoubles ? "DOUBLES" : "SINGLES";
+        const champText = isDoubles || isTrios ? "CHAMPIONS" : "CHAMPION";
         const eventString = `${tourneyName} ${gameMode} ${champText}`;
         states.champion[0][1]({
           ...states.champion[0][1],

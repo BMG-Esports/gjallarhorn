@@ -33,7 +33,9 @@ import {
 } from "../../@types/challengermode";
 
 const entrantName = (e: Entrant) =>
-  [e?.player1?.name, e?.player2?.name].filter((a) => a).join("/");
+  [e?.player1?.name, e?.player2?.name, e?.player3?.name]
+    .filter((a) => a)
+    .join("/");
 
 export type QueueSet = {
   id?: number | string;
@@ -447,6 +449,8 @@ export class QueueBackend extends Backend<State> {
                   qs.left?.player2?.id,
                   qs.right?.player1?.id,
                   qs.right?.player2?.id,
+                  qs.left?.player3?.id,
+                  qs.right?.player3?.id,
                 ].map((id) => this.pService.getPR(id))
               );
               return {
@@ -482,6 +486,20 @@ export class QueueBackend extends Backend<State> {
                 "entrant1.2.region": String(prs[1]?.region || ""),
                 "entrant1.2.winner":
                   qs.winnerIdx === 0 ? IMAGES.winner : IMAGES.default,
+
+                "entrant1.3.name": qs.left?.player3?.name || "TBD",
+                "entrant1.3.sponsor": qs.left?.player3?.sponsor || "",
+                "entrant1.3.sponsorPath": qs.left?.player3?.sponsor
+                  ? IMAGES.sponsor
+                  : IMAGES.blank,
+                "entrant1.3.country": getCountryFlag(qs.left?.player3?.country),
+                "entrant1.3.face": getLegendHead(qs.left?.player3?.legend),
+                "entrant1.3.legend": getLegendFull(qs.left?.player3?.legend),
+                ...getLegendOffset(qs.left?.player3?.legend, "entrant1.3"),
+                "entrant1.3.pr": String(prs[4]?.pr || "-"),
+                "entrant1.3.region": String(prs[4]?.region || ""),
+                "entrant1.3.winner":
+                  qs.winnerIdx === 0 ? IMAGES.winner : IMAGES.default,
                 "entrant2.name": entrantName(qs.right) || "TBD",
                 "entrant2.score": qs.rightScore || 0,
                 "entrant2.1.name": qs.right?.player1?.name || "TBD",
@@ -514,6 +532,22 @@ export class QueueBackend extends Backend<State> {
                 "entrant2.2.pr": String(prs[3]?.pr || "-"),
                 "entrant2.2.region": String(prs[3]?.region || ""),
                 "entrant2.2.winner":
+                  qs.winnerIdx === 1 ? IMAGES.winner : IMAGES.default,
+
+                "entrant2.3.name": qs.right?.player3?.name || "TBD",
+                "entrant2.3.sponsor": qs.right?.player3?.sponsor || "",
+                "entrant2.3.sponsorPath": qs.right?.player3?.sponsor
+                  ? IMAGES.sponsor
+                  : IMAGES.blank,
+                "entrant2.3.country": getCountryFlag(
+                  qs.right?.player3?.country
+                ),
+                "entrant2.3.face": getLegendHead(qs.right?.player3?.legend),
+                "entrant2.3.legend": getLegendFull(qs.right?.player3?.legend),
+                ...getLegendOffset(qs.right?.player3?.legend, "entrant2.3"),
+                "entrant2.3.pr": String(prs[5]?.pr || "-"),
+                "entrant2.3.region": String(prs[5]?.region || ""),
+                "entrant2.3.winner":
                   qs.winnerIdx === 1 ? IMAGES.winner : IMAGES.default,
               };
             })
