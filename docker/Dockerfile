@@ -1,11 +1,11 @@
 # Use the official Node.js 16 image as the base image
-FROM node:16-slim
+FROM node:24-slim
 
 # Set the working directory
 WORKDIR /app
 
 # Copy package.jsons (including nested) and package-lock.json
-COPY package.json package-lock.json .
+COPY package.json package-lock.json ./
 COPY packages packages
 RUN find packages \! -name "package.json" -mindepth 2 -maxdepth 2 -print | xargs rm -rf
 
