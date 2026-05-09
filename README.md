@@ -6,16 +6,13 @@ Gjallarhorn is a tool for Brawlhalla community tournament producers to generate 
 
 You will need a start.gg API key to use Gjallarhorn. If you don't have one already, get one at https://developer.start.gg/docs/authentication.
 
-To start Gjallarhorn, run the following commands in the project:
+To start Gjallarhorn, you can install [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+Once this has installed open Powershell and run:
 
 ```sh
-npm install
-npm run build
-node . -s [your-startgg-key-here]
+docker run -it --rm -e GJALLARHORN_STARTGG=[your-startgg-key-here] -p 3000:3000 shmeee/gjallarhorn:latest
 ```
-
-> [!NOTE]
-> You only need to run `npm install` and `npm run build` the first time you try to run Gjallarhorn.
 
 Then, launch the dashboard at http://localhost:3000.
 
@@ -122,6 +119,14 @@ You can create presets for each section. You can also delete the most recently c
 </details>
 
 ## Development Overview
+
+To run Gjallarhorn locally, use the following:
+
+```sh
+npm install
+npm run build
+node . -s [your-startgg-key-here]
+```
 
 Gjallarhorn consists of a React front end and a NodeJS backend. The NodeJS
 backends act as data stores for the data input into the cards. Backend updates
