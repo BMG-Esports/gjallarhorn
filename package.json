@@ -12,7 +12,7 @@
     "gjallarhorn": "packages/cli/lib/index.js"
   },
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky install && npm run build --workspace=packages/tokens",
     "build": "npm run build --workspaces",
     "clean": "npm run clean --workspaces && rimraf output temp",
     "build:clean": "npm run clean && npm run build",
