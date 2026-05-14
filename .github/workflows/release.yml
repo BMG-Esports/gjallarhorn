@@ -33,6 +33,12 @@ jobs:
       - name: Package executables
         run: npm run package
 
+      - name: Archive macOS binaries
+        run: |
+          tar -czf dist/gjallarhorn-macos-x64.tar.gz -C dist gjallarhorn-macos-x64
+          tar -czf dist/gjallarhorn-macos-arm64.tar.gz -C dist gjallarhorn-macos-arm64
+          rm dist/gjallarhorn-macos-x64 dist/gjallarhorn-macos-arm64
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
