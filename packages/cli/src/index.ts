@@ -3,6 +3,7 @@
 import { Command, Option } from "commander";
 import { config, container, start } from "@bmg-esports/gjallarhorn-core";
 import * as tokens from "@bmg-esports/gjallarhorn-tokens";
+import open from "open";
 import path = require("path");
 
 const { version } = require("../package.json");
@@ -66,6 +67,7 @@ program
       CM_REFRESH_KEY: args.challengermode,
     });
     glob.container = container;
+    if ((process as any).pkg) open(args.host);
     glob.tokens = tokens;
     Object.entries(tokens).map(
       ([name, token]) => (glob[name] = container.get(token))
