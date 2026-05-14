@@ -4,9 +4,46 @@ import { Command, Option } from "commander";
 import { config, container, start } from "@bmg-esports/gjallarhorn-core";
 import * as tokens from "@bmg-esports/gjallarhorn-tokens";
 import open from "open";
+import fs = require("fs");
 import path = require("path");
 
 const { version } = require("../package.json");
+
+interface UserConfig {
+  name?: string;
+  port?: number;
+  output?: string;
+  startgg?: string;
+  challengermode?: string;
+}
+
+const CONFIG_TEMPLATE: UserConfig = {
+  name: config.NAME,
+  port: config.PORT,
+  output: "output",
+  startgg: "",
+  challengermode: "",
+};
+
+function loadUserConfig(): UserConfig {
+  const isPkg = !!(process as any).pkg;
+  const configDir = isPkg ? path.dirname(process.execPath) : process.cwd();
+  const configPath = path.join(configDir, "gjallarhorn.config.json");
+
+  if (isPkg && !fs.existsSync(configPath)) {
+    fs.writeFileSync(configPath, JSON.stringify(CONFIG_TEMPLATE, null, 2));
+  }
+
+  if (!fs.existsSync(configPath)) return {};
+
+  try {
+    return JSON.parse(fs.readFileSync(configPath, "utf8"));
+  } catch {
+    return {};
+  }
+}
+
+const userConfig = loadUserConfig();
 
 const program = new Command();
 
@@ -18,7 +55,7 @@ program
   .version(version)
   .addOption(
     new Option("-n, --name <string>", "friendly name")
-      .default(config.NAME)
+      .default(userConfig.name ?? config.NAME)
       .env("GJALLARHORN_NAME")
   )
   .addOption(
@@ -28,13 +65,13 @@ program
   )
   .addOption(
     new Option("-p, --port <number>", "port number")
-      .default(config.PORT)
+      .default(userConfig.port ?? config.PORT)
       .env("GJALLARHORN_PORT")
       .argParser((v) => parseInt(v, 10))
   )
   .addOption(
     new Option("-o, --output <path>", "output path")
-      .default(path.resolve("output"))
+      .default(path.resolve(userConfig.output ?? "output"))
       .env("GJALLARHORN_OUTPUT")
       .argParser((v) => path.resolve(v))
   )
@@ -45,15 +82,14 @@ program
       .argParser((v) => path.resolve(v))
   )
   .addOption(
-    new Option("-s, --startgg <key>", "start.gg API key").env(
-      "GJALLARHORN_STARTGG"
-    )
+    new Option("-s, --startgg <key>", "start.gg API key")
+      .default(userConfig.startgg || undefined)
+      .env("GJALLARHORN_STARTGG")
   )
   .addOption(
-    new Option(
-      "-cm, --challengermode <key>",
-      "challengermode API refresh key"
-    ).env("GJALLARHORN_CM_REFRESH_KEY")
+    new Option("-cm, --challengermode <key>", "challengermode API refresh key")
+      .default(userConfig.challengermode || undefined)
+      .env("GJALLARHORN_CM_REFRESH_KEY")
   )
   .action(async (args) => {
     const glob: any = global;
