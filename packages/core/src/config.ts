@@ -16,6 +16,7 @@ const config: Config = {
     },
   },
   STARTGG_API_KEY: "",
+  CM_REFRESH_KEY: "",
 };
 
 export const update = (cfg: Partial<Config>) => Object.assign(config, cfg);

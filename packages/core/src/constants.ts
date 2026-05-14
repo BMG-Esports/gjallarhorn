@@ -280,6 +280,15 @@ export const SLUG_TO_REGION = new Map([
   ["north-america", "North America"],
   ["south-america", "South America"],
   ["southeast-asia", "Southeast Asia"],
+  ["middle-east", "Middle East"],
+]);
+
+export const REGION_ID_TO_REGION = new Map([
+  [3, "North America"],
+  [4, "Europe"],
+  [5, "South America"],
+  [6, "Southeast Asia"],
+  [7, "Middle East"],
 ]);
 
 export const SGG_SELECTION_TO_LEGEND = new Map([
@@ -344,6 +353,11 @@ export const SGG_SELECTION_TO_LEGEND = new Map([
   ["2120", "TEZCA"],
   ["2304", "THEA"],
   ["2309", "RED_RAPTOR"],
+  ["2381", "LOKI"],
+  ["2439", "SEVEN"],
+  ["2494", "VIVI"],
+  ["2537", "IMUGI"],
+  ["2600", "KING_ZUVA"],
 ]);
 
 export const LEGEND_RENDER_OFFSETS: {
@@ -395,6 +409,7 @@ export const LEGEND_RENDER_OFFSETS: {
   HEATBLAST: { offsetX: 12, offsetZ: 60 },
   HELLBOY: { offsetX: -180, offsetZ: 58 },
   HUGIN: { offsetX: -30, offsetZ: 24 },
+  IMUGI: { offsetX: 0, offsetZ: 0 },
   INFERNAL_WARLOCK_VOLKOV: { offsetX: -82, offsetZ: -18 },
   ISAIAH: { offsetX: -172, offsetZ: 224 },
   JAEYUN: { offsetX: -42, offsetZ: 24 },
@@ -407,8 +422,10 @@ export const LEGEND_RENDER_OFFSETS: {
   KING_KNIGHT: { offsetX: -46, offsetZ: 68 },
   KOJI: { offsetX: -154, offsetZ: 170 },
   KOR: { offsetX: -12, offsetZ: 78 },
+  KRIEG: { offsetX: 0, offsetZ: 0 },
   LARA_CROFT: { offsetX: 36, offsetZ: 68 },
   LEONARDO: { offsetX: 28, offsetZ: 0 },
+  LILITH: { offsetX: 0, offsetZ: 0 },
   LIN_FEI: { offsetX: -61, offsetZ: 194 },
   LORD_VRAXX: { offsetX: -142, offsetZ: 132 },
   LUCIEN: { offsetX: -38, offsetZ: 96 },
@@ -434,6 +451,7 @@ export const LEGEND_RENDER_OFFSETS: {
   PLAGUE_KNIGHT: { offsetX: -75, offsetZ: 46 },
   PO: { offsetX: 130, offsetZ: 18 },
   PRINCESS_BUBBLEGUM: { offsetX: 68, offsetZ: -58 },
+  PRIYA: { offsetX: 0, offsetZ: 0 },
   QUEEN_NAI: { offsetX: 26, offsetZ: 284 },
   RAGNIR: { offsetX: -156, offsetZ: 144 },
   RAPHAEL: { offsetX: 78, offsetZ: 0 },
@@ -469,6 +487,7 @@ export const LEGEND_RENDER_OFFSETS: {
   THEA: { offsetX: 0, offsetZ: 0 },
   THOR: { offsetX: -32, offsetZ: 10 },
   TIGRESS: { offsetX: 0, offsetZ: 244 },
+  TINY_TYNA: { offsetX: 0, offsetZ: 0 },
   TOPH: { offsetX: -106, offsetZ: 242 },
   ULGRIM: { offsetX: 0, offsetZ: 48 },
   VAL: { offsetX: -42, offsetZ: 194 },

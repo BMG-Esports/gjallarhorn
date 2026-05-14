@@ -13,16 +13,15 @@ export type Player = {
 
 export type Entrant = {
   /**
-   * Whether the given entrant is a start.gg entrant or a custom entrant (i.e.
-   * from the player database)
+   * Whether the given entrant is from a live start.gg or challengermode tournament or a custom entrant (i.e. from the player database)
    */
-  isStartGG?: boolean;
+  isLive?: boolean;
   score?: number;
 
   /**
-   * Entrant ID. Only set if isStartGG is true.
+   * Entrant ID. Only set if isLive is true.
    */
-  id?: number;
+  id?: number | string;
 
   player1?: Player;
   player2?: Player;
@@ -80,6 +79,10 @@ export type Config = {
    * start.gg API key.
    */
   STARTGG_API_KEY: string;
+  /**
+   * Challengermode API refresh key.
+   */
+  CM_REFRESH_KEY: string;
 
   PLAYER_OVERRIDES: { [id: number]: Player };
 };

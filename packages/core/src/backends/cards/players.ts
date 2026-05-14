@@ -17,6 +17,7 @@ import { BackendError } from "../../support/errors";
 import { inject } from "inversify";
 import { TournamentBackend } from "../pages/tournament";
 import {
+  TChallengerModeService,
   TOutputService,
   TPlayersBackend,
   TPlayerService,
@@ -24,6 +25,11 @@ import {
   TTournamentBackend,
 } from "@bmg-esports/gjallarhorn-tokens";
 import { wrapPushButton } from "../../support/ui";
+import { ChallengerModeService } from "../../services/challenger-mode";
+import {
+  GQLTournamentLineup,
+  GQLUserProfile,
+} from "../../@types/challengermode";
 
 type State = {
   leftScore: number;
@@ -34,6 +40,7 @@ type State = {
 
   dirtyState?: DirtyState;
   pushPlayersState?: PushButtonState;
+  entrantSize: number;
 };
 
 const moneyFormatter = new Intl.NumberFormat("en-US", {
@@ -47,6 +54,7 @@ export class PlayersBackend extends Backend<State> {
   @inject(TStartGGService) private sgg: StartGGService;
   @inject(TPlayerService) private pService: PlayerService;
   @inject(TOutputService) private output: OutputService;
+  @inject(TChallengerModeService) private cm: ChallengerModeService;
 
   identifier = TPlayersBackend;
   scopes = ["pages:tournament"];
@@ -55,15 +63,16 @@ export class PlayersBackend extends Backend<State> {
     leftScore: 0,
     rightScore: 0,
     left: {
-      isStartGG: true,
+      isLive: true,
       player1: {},
       player2: {},
     },
     right: {
-      isStartGG: true,
+      isLive: true,
       player1: {},
       player2: {},
     },
+    entrantSize: 1,
   };
 
   constructor(
@@ -89,21 +98,33 @@ export class PlayersBackend extends Backend<State> {
 
     this.on(() => {
       this.setState({
-        left: { isStartGG: true, player1: {}, player2: {} },
-        right: { isStartGG: true, player1: {}, player2: {} },
+        left: { isLive: true, player1: {}, player2: {} },
+        right: { isLive: true, player1: {}, player2: {} },
+        entrantSize: this._tournament.state.sggTournament.entrantSize,
       });
-    }, [this._tournament.state.tournament.eventId]);
+    }, [this._tournament.state.sggTournament.eventId]);
+
+    this.on(() => {
+      this.setState({
+        left: { isLive: true, player1: {}, player2: {} },
+        right: { isLive: true, player1: {}, player2: {} },
+        entrantSize: this._tournament.state.cmTournament.entrantSize,
+      });
+    }, [
+      this._tournament.state.cmTournament.tournamentId,
+      this._tournament.state.cmTournament.entrantSize,
+    ]);
   }
 
   private async loadEntrant(side: "left" | "right") {
     const e = this.state[side];
-    if (!e.isStartGG) {
+    if (!e.isLive) {
       return;
     }
 
     if (!e.id) {
       return this.setState({
-        [side]: { isStartGG: true, player1: {}, player2: {} },
+        [side]: { isLive: true, player1: {}, player2: {} },
         [side + "Score"]: 0,
       });
     }
@@ -112,17 +133,32 @@ export class PlayersBackend extends Backend<State> {
       return; // Already populated.
     }
 
-    let sEntrant: SEntrant;
-    try {
-      sEntrant = await this.sgg.getEntrantById(e.id);
-    } catch (e) {
-      if (e instanceof BackendError) throw e.nonFatal();
-      throw e;
+    let entrant: Entrant;
+    if (this._tournament.state.isChallengerMode) {
+      let cmUser: GQLTournamentLineup;
+      try {
+        cmUser = await this.cm.getEntrantById(
+          e.id as string,
+          this._tournament.state.cmTournament.tournamentId
+        );
+      } catch (e) {
+        if (e instanceof BackendError) throw e.nonFatal();
+        throw e;
+      }
+      entrant = await this.pService.parseLineup(cmUser);
+    } else {
+      let sEntrant: SEntrant;
+      try {
+        sEntrant = await this.sgg.getEntrantById(e.id as number);
+      } catch (e) {
+        if (e instanceof BackendError) throw e.nonFatal();
+        throw e;
+      }
+      entrant = await this.pService.parseEntrant(sEntrant);
     }
-    const entrant = await this.pService.parseEntrant(sEntrant);
 
     this.setState({
-      [side]: { id: e.id, isStartGG: true, ...entrant },
+      [side]: { id: e.id, isLive: true, ...entrant },
     });
   }
 

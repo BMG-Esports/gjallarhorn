@@ -12,22 +12,39 @@
     "gjallarhorn": "packages/cli/lib/index.js"
   },
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky install && npm run build --workspace=packages/tokens",
     "build": "npm run build --workspaces",
     "clean": "npm run clean --workspaces && rimraf output temp",
     "build:clean": "npm run clean && npm run build",
+    "build:release": "npm run build --workspace=packages/tokens && npm run build --workspace=packages/core && npm run build --workspace=packages/cli",
+    "package": "pkg . --out-path dist --compress GZip",
     "dev:cli": "cross-env GJALLARHORN_PORT=55213 npm run dev --workspace=packages/cli",
     "dev:client": "cross-env GJALLARHORN_PORT=55213 npm run dev:client --workspace=packages/core",
     "dev": "concurrently \"npm run dev:cli\" \"npm run dev:client\"",
     "start": "node --inspect=0.0.0.0:9229 --enable-source-maps .",
-    "docker": "bash docker/scripts/build.sh"
+    "docker": "bash docker/scripts/build.sh",
+    "generate-schema": "mkdir -p tmp-schema && curl -o tmp-schema/schema.graphql https://publicapi.challengermode.com/graphql?sdl && graphql-schema-typescript generate-ts tmp-schema --output packages/core/src/@types/challengermode.d.ts && rm -rf tmp-schema"
   },
   "devDependencies": {
     "@types/node": "*",
+    "concurrently": "^8.2.2",
+    "graphql": "^16.10.0",
+    "graphql-schema-typescript": "^1.5.2",
     "husky": "^7.0.4",
+    "pkg": "^5.8.1",
     "rimraf": "^3.0.2",
-    "typescript": "^4.4.4",
-    "concurrently": "^8.2.2"
+    "typescript": "^4.4.4"
+  },
+  "pkg": {
+    "assets": [
+      "packages/core/lib/client/**/*"
+    ],
+    "targets": [
+      "node18-win-x64",
+      "node18-macos-x64",
+      "node18-macos-arm64"
+    ],
+    "outputPath": "dist"
   },
   "lint-staged": {
     "**/*": [

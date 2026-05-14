@@ -8,7 +8,7 @@ import { fuzzySearch } from "react-select-search";
 import { SearchDropdown } from "../fields/dropdown";
 
 export const queueSetName = (qs: QueueSet) =>
-  qs.round
+  qs.round || qs.identifier
     ? `${entrantName(qs.left) || "TBD"} ${qs.score || "vs"} ${
         entrantName(qs.right) || "TBD"
       }`

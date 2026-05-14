@@ -15,5 +15,6 @@
     "incremental": true,
     "outDir": "../../lib/client"
   },
-  "include": ["./"]
+  "include": ["./"],
+  "references": [{ "path": "../../../tokens" }]
 }
