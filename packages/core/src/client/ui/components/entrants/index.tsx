@@ -48,7 +48,9 @@ export function useEntrantOptions(entrants: Entrant[], prefetch = true) {
     Promise.all(
       candidates.map((e) => {
         const name = e.player1?.name
-          ? [e.player1.name, e.player2?.name].filter((a) => a).join(" / ")
+          ? [e.player1.name, e.player2?.name, e.player3?.name]
+              .filter((a) => a)
+              .join(" / ")
           : "Loading...";
         entrantOptions.push({ name, value: String(e.id) });
         loading.current.add(String(e.id));
@@ -235,6 +237,7 @@ export function EntrantColumn({
   name,
   entrant,
   isTwos,
+  isThrees,
   entrantOptions,
   modifyEntrants,
   withScore,
@@ -248,6 +251,7 @@ export function EntrantColumn({
   name: string;
   entrant: Entrant;
   isTwos?: boolean;
+  isThrees?: boolean;
   extras?: (e: Entrant, sE: SetEntrant) => React.ReactNode;
   after?: (e: Entrant, sE: SetEntrant) => React.ReactNode;
 
@@ -279,6 +283,7 @@ export function EntrantColumn({
                 isLive: !isLive,
                 player1: {},
                 player2: {},
+                player3: {},
               });
             }}
           >
@@ -324,6 +329,7 @@ export function EntrantColumn({
               isLive: true,
               player1: {},
               player2: {},
+              player3: {},
             });
           }}
         />
@@ -357,12 +363,12 @@ export function EntrantColumn({
       )}
       <PlayerFields
         disabled={disabled}
-        playerNumber={isTwos && 1}
+        playerNumber={(isTwos || isThrees) && 1}
         player={entrant.player1}
         setPlayer={(p) => setEntrant({ ...entrant, player1: p })}
         fields={playerFields}
       />
-      {isTwos && (
+      {(isTwos || isThrees) && (
         <>
           <hr />
           <PlayerFields
@@ -370,6 +376,18 @@ export function EntrantColumn({
             playerNumber={2}
             player={entrant.player2}
             setPlayer={(p) => setEntrant({ ...entrant, player2: p })}
+            fields={playerFields}
+          />
+        </>
+      )}
+      {isThrees && (
+        <>
+          <hr />
+          <PlayerFields
+            disabled={disabled}
+            playerNumber={3}
+            player={entrant.player3}
+            setPlayer={(p) => setEntrant({ ...entrant, player3: p })}
             fields={playerFields}
           />
         </>
@@ -418,6 +436,7 @@ export function EntrantColumns({
   setRightScore?: (s: number) => void;
 }) {
   const isTwos = entrantSize === 2;
+  const isThrees = entrantSize === 3;
   const swapSides = () => (setLeft(right), setRight(left));
   const { entrantOptions, getEntrantOptions } = useEntrantOptions(
     [left, right],
@@ -431,6 +450,7 @@ export function EntrantColumns({
     afterPlayer,
     getEntrantOptions,
     isTwos,
+    isThrees,
     entrantOptions,
     modifyEntrants,
     withScore,
@@ -481,7 +501,9 @@ export function EntrantPredictions({
   setThird: SetEntrant;
   modifyEntrants?: boolean;
 }) {
-  const isTwos = useSggTournament().entrantSize === 2;
+  const sggEntrantSize = useSggTournament().entrantSize;
+  const isTwos = sggEntrantSize === 2;
+  const isThrees = sggEntrantSize === 3;
   const { entrantOptions, getEntrantOptions } = useEntrantOptions([
     first,
     second,
@@ -493,12 +515,14 @@ export function EntrantPredictions({
     | "entrantOptions"
     | "getEntrantOptions"
     | "isTwos"
+    | "isThrees"
     | "modifyEntrants"
     | "playerFields"
   > = {
     entrantOptions,
     getEntrantOptions,
     isTwos,
+    isThrees,
     modifyEntrants,
     playerFields: ["sponsor", "name", "legend", "country"],
   };

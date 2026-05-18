@@ -41,6 +41,7 @@ const emptyEntrant = (): Entrant => ({
   isLive: true,
   player1: emptyPlayer(),
   player2: emptyPlayer(),
+  player3: emptyPlayer(),
 });
 export const emptyPostGame = () => ({
   deaths: 0,
@@ -356,6 +357,8 @@ export class GameBackend extends Backend<State> {
           right.player1,
           left.player2,
           right.player2,
+          left.player3,
+          right.player3,
         ]
           .map(async (player, i) => {
             const pr = await this.pService.getPR(player?.id);
@@ -375,7 +378,11 @@ export class GameBackend extends Backend<State> {
           .concat(
             [left, right].map(async (entrant, i) => ({
               score: scores[i % 2],
-              name: [entrant.player1?.name, entrant.player2?.name]
+              name: [
+                entrant.player1?.name,
+                entrant.player2?.name,
+                entrant.player3?.name,
+              ]
                 .filter((a) => a)
                 .join("/"),
               country: "",
@@ -396,6 +403,9 @@ export class GameBackend extends Backend<State> {
 
         if (left.player2?.id || right.player2?.id) {
           live.push(left.player2, right.player2);
+        }
+        if (left.player3?.id || right.player3?.id) {
+          live.push(left.player3, right.player3);
         }
         await this.output.writeJSON(
           "live/game.json",

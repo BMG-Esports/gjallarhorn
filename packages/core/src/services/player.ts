@@ -18,10 +18,7 @@ import {
   TTournamentBackend,
 } from "@bmg-esports/gjallarhorn-tokens";
 import { TournamentBackend } from "../backends/pages/tournament";
-import {
-  GQLTournamentLineup,
-  GQLUserProfile,
-} from "../@types/challengermode";
+import { GQLTournamentLineup, GQLUserProfile } from "../@types/challengermode";
 
 @injectable()
 export class PlayerService {
@@ -73,9 +70,13 @@ export class PlayerService {
 
     e.player1 = users[0];
     e.player2 = {};
+    e.player3 = {};
 
-    if (users.length === 2) {
+    if (users.length >= 2) {
       e.player2 = users[1];
+    }
+    if (users.length >= 3) {
+      e.player3 = users[2];
     }
 
     return e;
@@ -199,13 +200,12 @@ export class PlayerService {
 
   async getPR(playerId: number) {
     if (!playerId) return null;
+    const gameMode = this.t.state.isChallengerMode
+      ? this.t.state.cmTournament.entrantSize
+      : this.t.state.sggTournament.entrantSize;
+    if (gameMode === 3) return null;
     try {
-      return await this.db.getPlayerPR(
-        playerId,
-        this.t.state.isChallengerMode
-          ? this.t.state.cmTournament.entrantSize
-          : this.t.state.sggTournament.entrantSize
-      );
+      return await this.db.getPlayerPR(playerId, gameMode);
     } catch (e) {
       if (e instanceof BackendError) {
         this.errors.report(e.nonFatal());
@@ -222,6 +222,7 @@ export class PlayerService {
       const gameMode = this.t.state.isChallengerMode
         ? this.t.state.cmTournament.entrantSize
         : this.t.state.sggTournament.entrantSize;
+      if (gameMode === 3) return null;
       const events = await this.db.getPlayerEvents(playerId, gameMode);
       const allMatches = events.map(async (event) =>
         this.db.getPlayerEventMatches(playerId, event.tournament.id)
@@ -247,6 +248,7 @@ export class PlayerService {
     const gameMode = this.t.state.isChallengerMode
       ? this.t.state.cmTournament.entrantSize
       : this.t.state.sggTournament.entrantSize;
+    if (gameMode === 3) return [0, 0];
     const entrant1PlayerIds = [left?.player1?.id],
       entrant2PlayerIds = [right?.player1?.id];
     if (gameMode === 2) {

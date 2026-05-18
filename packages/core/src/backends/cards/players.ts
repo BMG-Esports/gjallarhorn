@@ -66,11 +66,13 @@ export class PlayersBackend extends Backend<State> {
       isLive: true,
       player1: {},
       player2: {},
+      player3: {},
     },
     right: {
       isLive: true,
       player1: {},
       player2: {},
+      player3: {},
     },
     entrantSize: 1,
   };
@@ -98,16 +100,16 @@ export class PlayersBackend extends Backend<State> {
 
     this.on(() => {
       this.setState({
-        left: { isLive: true, player1: {}, player2: {} },
-        right: { isLive: true, player1: {}, player2: {} },
+        left: { isLive: true, player1: {}, player2: {}, player3: {} },
+        right: { isLive: true, player1: {}, player2: {}, player3: {} },
         entrantSize: this._tournament.state.sggTournament.entrantSize,
       });
     }, [this._tournament.state.sggTournament.eventId]);
 
     this.on(() => {
       this.setState({
-        left: { isLive: true, player1: {}, player2: {} },
-        right: { isLive: true, player1: {}, player2: {} },
+        left: { isLive: true, player1: {}, player2: {}, player3: {} },
+        right: { isLive: true, player1: {}, player2: {}, player3: {} },
         entrantSize: this._tournament.state.cmTournament.entrantSize,
       });
     }, [
@@ -124,7 +126,7 @@ export class PlayersBackend extends Backend<State> {
 
     if (!e.id) {
       return this.setState({
-        [side]: { isLive: true, player1: {}, player2: {} },
+        [side]: { isLive: true, player1: {}, player2: {}, player3: {} },
         [side + "Score"]: 0,
       });
     }
@@ -181,6 +183,8 @@ export class PlayersBackend extends Backend<State> {
           right.player1,
           left.player2,
           right.player2,
+          left.player3,
+          right.player3,
         ];
 
         const prs = await Promise.all(
