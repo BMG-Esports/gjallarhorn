@@ -1,6 +1,6 @@
 # `Gjallarhorn`
 
-Gjallarhorn is a tool for Brawlhalla community tournament producers to generate formatted JSON files for esports tournament stream overlays. Gjallarhorn can generate JSON files for multiple use cases, including tickers, casters, lower thirds, queues, players, and games. It pulls data from challengermode as well as Brawlhalla's Stats API.
+Gjallarhorn is a tool for Brawlhalla community tournament producers to generate formatted JSON files for esports tournament stream overlays. Gjallarhorn can generate JSON files for multiple use cases, including tickers, casters, lower thirds, queues, players, and games. It pulls data from start.gg, challengermode as well as Brawlhalla's Stats API.
 
 ## Getting Started
 
@@ -176,7 +176,7 @@ function CoolComponent() {
 **Errors:** All errors are treated as fatal even though they won't crash the
 app. We publish the errors to the operator and give the user the option to mark
 them as non-fatal and pause the tournament, or default to a meaningful value
-(like if challengermode does not return a value for a field)
+(like if the API does not return a value for a field)
 
 **Project Structure:** Core contains the meat of Gjallarhorn. You will find card
 UI built from React components in `src/client/pages/cards` and their respective
