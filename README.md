@@ -4,15 +4,22 @@ Gjallarhorn is a tool for Brawlhalla community tournament producers to generate 
 
 ## Getting Started
 
-You will need a challengermode API key to use Gjallarhorn. If you don't have one already, get one at https://www.challengermode.com/developers.
+You will need a either a start.gg API key or a challengermode API key to use Gjallarhorn. If you don't have one already:
+- Get a startgg API key at https://developer.start.gg/docs/authentication.
+- Get a challengermode API key at https://www.challengermode.com/developers.
 
-To start Gjallarhorn, you can install [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+If you only need to interact with challengermode tournaments, you will only need a challengermode API key & vice-versa.
 
-Once this has installed open Powershell and run:
+To start Gjallarhorn, run the following commands in the project, substituting the API keys you have:
 
 ```sh
-docker run -it --rm -e GJALLARHORN_CM_REFRESH_KEY=[your-challengermode-key-here] -p 3000:3000 shmeee/gjallarhorn:challengerModeUpdate
+npm install
+npm run build
+node . -s [your-startgg-key-here] -cm [your-challengermode-key-here]
 ```
+
+> [!NOTE]
+> You only need to run `npm install` and `npm run build` the first time you try to run Gjallarhorn.
 
 Then, launch the dashboard at http://localhost:3000.
 
@@ -48,7 +55,7 @@ Push Brackets will output a JSON file to be used in bracket images. You can have
 
 ![A green checkmark](images/gjallarcheck.png)
 
-Hovering over the checkmark icon next to the search bar shows you the application latency and the rate limits for both the database and challengermode.
+Hovering over the checkmark icon next to the search bar shows you the application latency and the rate limits for both the database and start.gg/challengermode.
 
 ![A yellow disconnection indicator](images/gjallardc.png)
 
@@ -74,7 +81,7 @@ You can enter up to four different casters, with text boxes for their name, soci
 
 ![The Game card](images/gjallargame.png)
 
-This card can be input manually, or you can use the Set dropdown to populate text with a challengermode match. You can also import a set from the Queue card by clicking on the clipboard next to Push Round. Rounds won can be incremented using the plus and minus buttons next to Left and Right.
+This card can be input manually, or you can use the Set dropdown to populate text with an existing match. You can also import a set from the Queue card by clicking on the clipboard next to Push Round. Rounds won can be incremented using the plus and minus buttons next to Left and Right.
 
 </details>
 
@@ -101,7 +108,7 @@ Used to create tickers (as the name implies). These tickers can be manually move
 
 ![The Queue card](images/gjallarqueue.png)
 
-The Queue card pulls queues from a challengermode tournament. In order for this card to be useful, your tournament must have at least one active queue. You can continuously fetch the currently active queue every sixty seconds by clicking the timer next to Fetch Queue.
+The Queue card pulls queues from a start.gg/challengermode tournament. In order for this card to be useful, your tournament must have at least one active queue. You can continuously fetch the currently active queue every sixty seconds by clicking the timer next to Fetch Queue.
 
 </details>
 
@@ -120,18 +127,10 @@ You can create presets for each section. You can also delete the most recently c
 
 ## Development Overview
 
-To run Gjallarhorn locally, use the following:
-
-```sh
-npm install
-npm run build
-node . -cm [your-challengermode-key-here]
-```
-
 Gjallarhorn consists of a React front end and a NodeJS backend. The NodeJS
 backends act as data stores for the data input into the cards. Backend updates
 from `setState`are published over the websocket to the front end for display
-purposes (like results of calls for challengermode). The front end can also subscribe
+purposes (like results of API calls). The front end can also subscribe
 to those updates by calling `backend.useState([StateKeyHere])` and publish new
 updates itself. This mirrors React's `useState` hook.
 
